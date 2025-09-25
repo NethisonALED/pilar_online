@@ -1,3 +1,7 @@
+/*
+  Este arquivo contém todos os estilos personalizados da sua aplicação.
+  Ele é separado do HTML para manter a estrutura e a apresentação distintas.
+*/
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f8f9fa;
@@ -40,11 +44,8 @@ body {
 .modal.flex {
     display: flex;
 }
-#auth-container {
-    display: flex; 
-}
-#app-container {
-    display: none;
+#auth-container, #app-container {
+    display: none; /* Escondidos por padrão, controlados via JS */
 }
 
 /* Sidebar Collapse Styles */
