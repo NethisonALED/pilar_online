@@ -1,4 +1,4 @@
-import { supabase } from './app.js';
+import { supabase } from './supabaseClient.js';
 import { logAction } from './logger.js';
 
 class RelacionamentoApp {
