@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pilar</title>
-    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%2310b981%22 d=%22M224 448V224H160V448h64zM32 480H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32zm160-352H128V448h64V128zM320 448V256H256V448h64zM416 448V160H352V448h64zM480 64H32C14.3 64 0 49.7 0 32S14.3 0 32 0H480c17.7 0 32 14.3 32 32s-14.3 32-32 32z%22/></svg>">
     
     <!-- Bibliotecas Externas -->
@@ -19,7 +18,6 @@
 </head>
 <body class="text-gray-800 bg-gray-100">
 
-    <!-- Container de Autenticação -->
     <div id="auth-container" class="min-h-screen flex items-center justify-center">
         <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm">
             <div class="text-center mb-8">
@@ -44,36 +42,514 @@
         </div>
     </div>
 
-    <!-- Container Principal da Aplicação -->
-    <div id="app-container" style="display: none;">
+    <div id="app-container">
         <div class="flex h-screen">
-            <!-- Barra Lateral (Sidebar) -->
             <aside id="app-sidebar" class="app-sidebar w-64 flex-shrink-0 flex flex-col p-4 text-gray-300">
-                <!-- Conteúdo da barra lateral -->
+                <div class="sidebar-header px-4 pb-8 border-b border-gray-700 mb-4">
+                    <a href="#" class="flex items-center gap-2 text-xl font-semibold text-white">
+                        <i class="fas fa-building-columns"></i>
+                        <span>Pilar</span>
+                    </a>
+                </div>
+                <nav class="sidebar-menu px-2 flex-grow">
+                    <div class="menu-section mb-6">
+                        <div class="menu-title text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2">Principal</div>
+                        <a href="#" class="menu-link active flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="relatorio-rt">
+                            <i class="fas fa-file-invoice-dollar fa-fw"></i><span>Importar Vendas</span>
+                        </a>
+                        <a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="consulta-sysled">
+                            <i class="fas fa-database fa-fw"></i><span>Consulta Sysled</span>
+                        </a>
+                        <a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="inclusao-manual">
+                            <i class="fas fa-plus-circle fa-fw"></i><span>Inclusão Manual</span>
+                        </a>
+                        <a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="arquitetos">
+                            <i class="fas fa-users fa-fw"></i><span>Arquitetos</span>
+                        </a>
+                        <a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="pontuacao">
+                            <i class="fas fa-star fa-fw"></i><span>Pontuação</span>
+                        </a>
+                        <a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="comprovantes">
+                            <i class="fas fa-receipt fa-fw"></i><span>Comprovantes</span>
+                        </a>
+                        <a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="arquivos-importados">
+                            <i class="fas fa-folder-open fa-fw"></i><span>Arquivos Importados</span>
+                        </a>
+                        <a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="resultados">
+                            <i class="fas fa-chart-pie fa-fw"></i><span>Resultados</span>
+                        </a>
+                    </div>
+                </nav>
+                <div class="sidebar-footer mt-auto px-2">
+                    <a href="#" id="logout-button" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium">
+                        <i class="fas fa-sign-out-alt fa-fw"></i><span>Sair</span>
+                    </a>
+                </div>
+                <div class="border-t border-gray-700 mt-4 pt-4 px-2">
+                    <button id="sidebar-toggle-btn" class="w-full text-gray-400 hover:text-white hover:bg-gray-700 py-2.5 px-3 rounded-md text-sm font-medium flex items-center justify-center">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
             </aside>
 
-            <!-- Conteúdo Principal -->
             <main class="flex-grow p-6 md:p-10 overflow-y-auto">
-                <!-- Abas da Aplicação (Views) -->
-                <div id="relatorio-rt-view" class="tab-view active"></div>
-                <div id="consulta-sysled-view" class="tab-view"></div>
-                <div id="inclusao-manual-view" class="tab-view"></div>
-                <div id="arquitetos-view" class="tab-view"></div>
-                <div id="pontuacao-view" class="tab-view"></div>
-                <div id="comprovantes-view" class="tab-view"></div>
-                <div id="arquivos-importados-view" class="tab-view"></div>
-                <div id="resultados-view" class="tab-view"></div>
+                
+                <div id="relatorio-rt-view" class="tab-view active">
+                    <div class="container mx-auto max-w-4xl">
+                        <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+                            <header class="mb-8 text-center">
+                                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Importar Vendas</h1>
+                                <p class="text-gray-500 mt-2">Faça o upload do seu arquivo Excel ou CSV para registrar vendas e acumular os valores de RT para os arquitetos.</p>
+                            </header>
+                            <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg mb-8" role="alert">
+                                <p class="font-bold">Instruções</p>
+                                <p class="mt-2 text-sm">
+                                    1. Selecione seu arquivo (.xlsx, .xls, ou .csv).<br>
+                                    2. Na tela seguinte, associe as colunas da sua planilha aos campos do sistema.<br>
+                                    3. Os valores de RT serão calculados e somados ao saldo de cada arquiteto.
+                                </p>
+                            </div>
+                            <div class="text-center">
+                                <label for="rt-file-input" class="file-input-label bg-indigo-600 hover:bg-indigo-700"><i class="fas fa-upload mr-2"></i>Escolher Arquivo</label>
+                                <input type="file" id="rt-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="file-input">
+                                <p id="rt-file-name" class="text-sm text-gray-500 mt-2"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="consulta-sysled-view" class="tab-view">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-6">Consulta Sysled</h1>
+                    
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold">Filtros</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                            <div>
+                                <label for="sysled-filter-data-inicio" class="block text-sm font-medium text-gray-700">Data Início</label>
+                                <input type="date" id="sysled-filter-data-inicio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2">
+                            </div>
+                            <div>
+                                <label for="sysled-filter-data-fim" class="block text-sm font-medium text-gray-700">Data Fim</label>
+                                <input type="date" id="sysled-filter-data-fim" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2">
+                            </div>
+                            <div>
+                                <label for="sysled-filter-parceiro" class="block text-sm font-medium text-gray-700">Parceiro</label>
+                                <input type="text" id="sysled-filter-parceiro" placeholder="Nome ou ID do parceiro" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2">
+                            </div>
+                            <div>
+                                <label for="sysled-filter-excluir-parceiro" class="block text-sm font-medium text-gray-700">Excluir Parceiro</label>
+                                <input type="text" id="sysled-filter-excluir-parceiro" placeholder="IDs separados por vírgula" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2">
+                            </div>
+                            <div class="flex items-end gap-2">
+                                <button id="sysled-filter-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg">Filtrar</button>
+                                <button id="sysled-clear-filter-btn" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">Limpar</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold">Resultados da Consulta</h2>
+                            <div>
+                                <button id="sysled-refresh-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg mr-2"><i class="fas fa-sync-alt mr-2"></i>Atualizar Dados</button>
+                                <button id="copy-to-rt-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-copy mr-2"></i>Importar Vendas</button>
+                            </div>
+                        </div>
+                        <div id="sysled-table-container">
+                            <div class="text-center text-gray-500 py-8">
+                                <p>Clique em "Atualizar Dados" para carregar as informações da API Sysled.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="inclusao-manual-view" class="tab-view">
+                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Inclusão Manual de Comissão</h1>
+                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                         <div class="lg:col-span-1">
+                             <div class="bg-white rounded-2xl shadow-lg p-6">
+                                 <h2 class="text-xl font-semibold mb-4">Adicionar Comissão Avulsa</h2>
+                                 <form id="add-comissao-manual-form" class="space-y-4">
+                                     <div>
+                                         <label for="manual-id-parceiro" class="block text-sm font-medium text-gray-600">ID Parceiro</label>
+                                         <input type="text" id="manual-id-parceiro" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required>
+                                     </div>
+                                     <div>
+                                         <label for="manual-id-venda" class="block text-sm font-medium text-gray-600">ID Venda</label>
+                                         <input type="text" id="manual-id-venda" class="w-full p-2 bg-gray-50 border rounded-lg mt-1">
+                                     </div>
+                                     <div>
+                                        <label for="manual-valor-venda" class="block text-sm font-medium text-gray-600">Valor Venda</label>
+                                        <input type="number" step="0.01" id="manual-valor-venda" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" placeholder="Ex: 1500.50" required>
+                                     </div>
+                                     <div>
+                                         <label for="manual-data-venda" class="block text-sm font-medium text-gray-600">Data Venda</label>
+                                         <input type="date" id="manual-data-venda" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required>
+                                     </div>
+                                      <div>
+                                         <label for="manual-consultor" class="block text-sm font-medium text-gray-600">Consultor</label>
+                                         <input type="text" id="manual-consultor" class="w-full p-2 bg-gray-50 border rounded-lg mt-1">
+                                     </div>
+                                     <div>
+                                         <label for="manual-justificativa" class="block text-sm font-medium text-gray-600">Justificativa</label>
+                                         <textarea id="manual-justificativa" rows="3" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></textarea>
+                                     </div>
+                                     <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg">Adicionar Comissão</button>
+                                 </form>
+                             </div>
+                         </div>
+                         <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
+                             <h2 class="text-xl font-semibold mb-4">Histórico de Inclusões Manuais</h2>
+                             <div id="historico-manual-container" class="max-h-[70vh] overflow-y-auto">
+                                 <!-- Tabela de histórico será renderizada aqui -->
+                             </div>
+                         </div>
+                     </div>
+                </div>
+                
+                 <div id="arquitetos-view" class="tab-view">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-6">Cadastro de Arquitetos</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-1 space-y-6">
+                            <div class="bg-white rounded-2xl shadow-lg p-6">
+                                <h2 class="text-xl font-semibold mb-4">Adicionar Manualmente</h2>
+                                <form id="add-arquiteto-form" class="space-y-4">
+                                    <div>
+                                        <label for="arquiteto-id" class="block text-sm font-medium text-gray-600">ID</label>
+                                        <input type="text" id="arquiteto-id" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required>
+                                    </div>
+                                    <div>
+                                        <label for="arquiteto-nome" class="block text-sm font-medium text-gray-600">Nome</label>
+                                        <input type="text" id="arquiteto-nome" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required>
+                                    </div>
+                                    <div>
+                                        <label for="arquiteto-email" class="block text-sm font-medium text-gray-600">Email</label>
+                                        <input type="email" id="arquiteto-email" class="w-full p-2 bg-gray-50 border rounded-lg mt-1">
+                                    </div>
+                                    <div>
+                                        <label for="arquiteto-telefone" class="block text-sm font-medium text-gray-600">Telefone</label>
+                                        <input type="tel" id="arquiteto-telefone" class="w-full p-2 bg-gray-50 border rounded-lg mt-1">
+                                    </div>
+                                    <div>
+                                        <label for="arquiteto-pix" class="block text-sm font-medium text-gray-600">Chave PIX</label>
+                                        <input type="text" id="arquiteto-pix" class="w-full p-2 bg-gray-50 border rounded-lg mt-1">
+                                    </div>
+                                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg">Adicionar Arquiteto</button>
+                                </form>
+                            </div>
+                            <div class="bg-white rounded-2xl shadow-lg p-6">
+                                <h2 class="text-xl font-semibold mb-4">Importar Planilha</h2>
+                                <div class="text-center">
+                                    <label for="arquiteto-file-input" class="file-input-label bg-indigo-600 hover:bg-indigo-700"><i class="fas fa-file-excel mr-2"></i>Escolher Planilha</label>
+                                    <input type="file" id="arquiteto-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="file-input">
+                                    <p id="file-name-arquitetos" class="text-sm text-gray-500 mt-2"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-xl font-semibold">Arquitetos Cadastrados</h2>
+                                <div class="flex gap-2 items-center">
+                                    <button id="gerar-pagamentos-rt-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg text-sm">
+                                        <i class="fas fa-money-check-alt mr-2"></i>Gerar Pagamentos
+                                    </button>
+                                    <button id="export-csv-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm">Exportar</button>
+                                    <button id="delete-all-arquitetos-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Apagar Todos</button>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <input type="text" id="arquiteto-search-input" placeholder="Pesquisar por ID ou Nome..." class="w-full p-3 bg-gray-50 border rounded-lg">
+                            </div>
+                            <div id="arquitetos-table-container" class="overflow-x-auto"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="pontuacao-view" class="tab-view">
+                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Pontuação</h1>
+                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                         <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
+                             <h2 class="text-xl font-semibold mb-4">Ranking de Arquitetos</h2>
+                             <div id="ranking-table-container"></div>
+                         </div>
+                         <div class="bg-white rounded-2xl shadow-lg p-6">
+                             <h2 class="text-xl font-semibold mb-4">Ajuste Manual de Pontos</h2>
+                             <form id="add-pontos-form" class="space-y-4">
+                                 <div>
+                                     <label for="arquiteto-select" class="block text-sm font-medium text-gray-600 mb-1">Arquiteto</label>
+                                     <select id="arquiteto-select" class="w-full p-3 bg-gray-50 border rounded-lg" required></select>
+                                 </div>
+                                  <div>
+                                     <label for="pontos-valor" class="block text-sm font-medium text-gray-600 mb-1">Pontos (use negativo para remover)</label>
+                                     <input type="number" id="pontos-valor" class="w-full p-3 bg-gray-50 border rounded-lg" required>
+                                 </div>
+                                 <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg">Adicionar</button>
+                             </form>
+                         </div>
+                     </div>
+                </div>
+
+                <div id="comprovantes-view" class="tab-view">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-6">Controle de Pagamentos</h1>
+                    <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-8">
+                        <h2 class="text-xl font-semibold mb-4">Pesquisar Pagamentos</h2>
+                        <input type="text" id="pagamento-search-input" placeholder="Pesquisar por ID do Parceiro..." class="w-full p-3 bg-gray-50 border rounded-lg">
+                    </div>
+                    <div id="pagamentos-container" class="space-y-8"></div>
+                </div>
+
+                <div id="arquivos-importados-view" class="tab-view">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-6">Arquivos Importados</h1>
+                    <div id="arquivos-importados-container" class="space-y-6"></div>
+                </div>
+
+                <div id="resultados-view" class="tab-view">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-6">Resultados Gerais</h1>
+                    <div class="flex justify-end mb-6">
+                         <button id="calculate-results-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg">
+                             <i class="fas fa-sync-alt mr-2"></i>Calcular Resultados
+                         </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                            <h2 class="text-sm font-medium text-gray-500">Valor de RTs Pagas</h2>
+                            <p id="total-rt" class="text-3xl font-bold mt-2 text-emerald-600">R$ 0,00</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                            <h2 class="text-sm font-medium text-gray-500">Quantidade de RTs Pagas</h2>
+                            <p id="total-rt-quantidade" class="text-3xl font-bold mt-2 text-blue-600">0</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                            <h2 class="text-sm font-medium text-gray-500">RT Média</h2>
+                            <p id="rt-media" class="text-3xl font-bold mt-2 text-indigo-600">R$ 0,00</p>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
+        
+        <div id="rt-mapping-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-3xl">
+                <h2 class="text-xl font-semibold mb-4">Mapear Colunas de Vendas</h2>
+                <p class="text-sm text-gray-600 mb-6">Associe as colunas da sua planilha aos campos necessários do sistema.</p>
+                <form id="rt-mapping-form" class="space-y-4"></form>
+                <div class="flex justify-end gap-4 mt-6">
+                    <button type="button" id="cancel-rt-mapping-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Cancelar</button>
+                    <button type="button" id="confirm-rt-mapping-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg">Confirmar e Importar</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="arquiteto-mapping-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-3xl">
+                <h2 class="text-xl font-semibold mb-4">Mapear Colunas de Arquitetos</h2>
+                <p class="text-sm text-gray-600 mb-6">Associe as colunas da sua planilha aos campos de cadastro.</p>
+                <form id="arquiteto-mapping-form" class="space-y-4"></form>
+                <div class="flex justify-end gap-4 mt-6">
+                    <button type="button" id="cancel-arquiteto-mapping-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Cancelar</button>
+                    <button type="button" id="confirm-arquiteto-mapping-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg">Confirmar Importação</button>
+                </div>
+            </div>
+        </div>
 
-        <!-- Modais da Aplicação -->
-        <div id="rt-mapping-modal" class="modal"></div>
-        <div id="arquiteto-mapping-modal" class="modal"></div>
-        <div id="edit-arquiteto-modal" class="modal"></div>
-        <!-- ... outros modais -->
+        <div id="edit-arquiteto-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4 overflow-y-auto">
+            <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-3xl my-8 relative">
+                <h2 class="text-xl font-semibold mb-6 border-b pb-4">Ficha do Arquiteto</h2>
+                <button type="button" id="close-edit-modal-x-btn" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+                <form id="edit-arquiteto-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <input type="hidden" id="edit-arquiteto-original-id">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">ID</label>
+                        <p id="edit-arquiteto-id" class="mt-1 text-lg font-semibold text-gray-800"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Nome Completo</label>
+                        <input type="text" id="edit-arquiteto-nome" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">E-mail</label>
+                        <input type="email" id="edit-arquiteto-email" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Telefone</label>
+                        <input type="tel" id="edit-arquiteto-telefone" class="w-full p-2 bg-gray-50 border rounded-lg mt-1">
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-gray-600">Quantidade de Vendas</label>
+                        <input type="number" id="edit-arquiteto-vendas" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" min="0">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-600">Chave PIX</label>
+                        <input type="text" id="edit-arquiteto-pix" class="w-full p-2 bg-gray-50 border rounded-lg mt-1">
+                    </div>
+                    
+                    <div class="md:col-span-2 mt-4 pt-4 border-t">
+                        <h3 class="text-lg font-semibold mb-2">Valores de RT</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <label class="block text-sm font-medium text-gray-600">RT Acumulado (para pagamento)</label>
+                                <p id="edit-arquiteto-rt-acumulado" class="mt-1 text-2xl font-bold text-emerald-600"></p>
+                            </div>
+                             <div class="bg-gray-50 p-4 rounded-lg">
+                                <label class="block text-sm font-medium text-gray-600">Total de RTs Pagas (histórico)</label>
+                                <p id="edit-arquiteto-rt-total-pago" class="mt-1 text-2xl font-bold text-blue-600"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="md:col-span-2 mt-4 pt-4 border-t">
+                        <h3 class="text-lg font-semibold mb-2">Configurações de Venda</h3>
+                        <div class="grid grid-cols-3 gap-4 items-end">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600">Valor Total de Vendas</label>
+                                <p id="rt-valor-vendas" class="mt-1 text-lg font-bold text-gray-800"></p>
+                            </div>
+                            <div>
+                                <label for="rt-percentual" class="block text-sm font-medium text-gray-600">Percentual de RT</label>
+                                <select id="rt-percentual" class="w-full p-2 bg-gray-50 border rounded-lg mt-1">
+                                    <option value="0.03">3%</option>
+                                    <option value="0.05">5%</option>
+                                    <option value="0.10">10%</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600">Cálculo Exemplo</label>
+                                <p id="rt-valor-calculado" class="mt-1 text-lg font-bold text-gray-800"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2 flex justify-end gap-4 mt-6">
+                        <button type="button" id="consultar-vendas-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg">Consultar Vendas</button>
+                        <button type="button" id="consultar-vendas-sysled-btn" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-lg">Vendas Sysled</button>
+                        <button type="button" id="gerar-pagamento-ficha-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-6 rounded-lg">Gerar Pagamento</button>
+                        <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div id="add-value-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-md">
+                <h2 class="text-xl font-semibold mb-4" id="add-value-modal-title">Adicionar Valor de Venda Manual</h2>
+                <form id="add-value-form">
+                    <input type="hidden" id="add-value-arquiteto-id">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Valor da Nova Venda</label>
+                        <input type="number" step="0.01" id="add-value-input" class="w-full p-3 bg-gray-50 border rounded-lg" required placeholder="Ex: 1500.50">
+                    </div>
+                    <div class="flex justify-end gap-4 mt-6">
+                        <button type="button" id="cancel-add-value-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Cancelar</button>
+                        <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg">Adicionar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="comprovante-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-lg">
+                <h2 class="text-xl font-semibold mb-4" id="comprovante-modal-title">Detalhes do Pagamento</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Valor do RT</label>
+                        <p id="comprovante-valor-rt" class="mt-1 text-lg font-bold text-emerald-600"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Comprovante</label>
+                        <div id="comprovante-img-container" class="mt-2 border rounded-lg p-2 min-h-[100px] flex items-center justify-center">
+                            <p class="text-gray-500">Nenhum comprovante anexado.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button type="button" id="close-comprovante-modal-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Fechar</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MODAL PARA GERAR PAGAMENTOS -->
+        <div id="gerar-pagamentos-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-4xl">
+                <h2 class="text-xl font-semibold mb-4">Gerar Pagamentos Pendentes</h2>
+                <p class="text-sm text-gray-600 mb-6">Os seguintes arquitetos atingiram o valor mínimo de R$ 300,00 em RTs acumuladas e estão aptos para pagamento.</p>
+                <div id="gerar-pagamentos-table-container" class="max-h-[50vh] overflow-y-auto">
+                    <!-- Tabela será inserida aqui via JS -->
+                </div>
+                <div class="flex justify-end gap-4 mt-6">
+                    <button type="button" id="cancel-gerar-pagamentos-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Cancelar</button>
+                    <button type="button" id="confirmar-geracao-comprovantes-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg">Gerar Comprovantes</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL PARA HISTÓRICO DE VENDAS DO ARQUITETO -->
+        <div id="sales-history-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-2xl">
+                <h2 class="text-xl font-semibold mb-4" id="sales-history-modal-title">Histórico de Vendas do Parceiro</h2>
+                <div id="sales-history-table-container" class="max-h-[60vh] overflow-y-auto">
+                    <!-- Tabela será inserida aqui via JS -->
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button type="button" id="close-sales-history-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Fechar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL PARA DETALHES DA COMISSÃO MANUAL -->
+        <div id="comissao-manual-details-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-lg">
+                <h2 class="text-xl font-semibold mb-4">Detalhes da Inclusão Manual</h2>
+                <div id="comissao-manual-details-content" class="space-y-3">
+                    <!-- Details will be populated here by JS -->
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button type="button" id="close-comissao-manual-details-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Fechar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL PARA EDITAR VALOR RT -->
+        <div id="edit-rt-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-md">
+                <h2 class="text-xl font-semibold mb-4">Editar Valor do RT</h2>
+                <form id="edit-rt-form">
+                    <input type="hidden" id="edit-rt-pagamento-id">
+                    <input type="hidden" id="edit-rt-pagamento-date">
+                    <div>
+                        <label for="edit-rt-input" class="block text-sm font-medium text-gray-600 mb-1">Novo Valor do RT</label>
+                        <input type="number" step="0.01" id="edit-rt-input" class="w-full p-3 bg-gray-50 border rounded-lg" required placeholder="Ex: 350.75">
+                    </div>
+                    <div class="flex justify-end gap-4 mt-6">
+                        <button type="button" id="cancel-edit-rt-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Cancelar</button>
+                        <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- MODAL PARA DETALHES DA VENDA -->
+        <div id="sale-details-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-2xl">
+                <h2 class="text-xl font-semibold mb-4" id="sale-details-modal-title">Detalhes da Venda</h2>
+                <div id="sale-details-content" class="max-h-[60vh] overflow-y-auto">
+                    <!-- Details will be populated here by JS -->
+                </div>
+                <div class="flex justify-end gap-4 mt-6">
+                    <button type="button" id="import-single-sale-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg">Importar Venda</button>
+                    <button type="button" id="close-sale-details-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Fechar</button>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
-    <!-- Script Principal da Aplicação -->
+    
     <script type="module" src="main.js"></script>
 </body>
 </html>
+
