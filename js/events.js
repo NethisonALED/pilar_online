@@ -1,134 +1,119 @@
-function initEventListeners(app) {
-    // --- Navegação ---
+/**
+ * Inicializa todos os event listeners da aplicação.
+ * Utiliza delegação de eventos no container principal para otimizar o desempenho.
+ * @param {RelacionamentoApp} app - A instância principal da classe da aplicação.
+ */
+export function initializeEventListeners(app) {
+    const mainContainer = document.getElementById('app-container');
+    if (!mainContainer) {
+        console.error("Container principal #app-container não encontrado.");
+        return;
+    }
+
+    // --- NAVEGAÇÃO POR ABAS ---
     const menuLinks = document.querySelectorAll('.menu-link');
-    // Este seletor precisa ser ajustado para pegar os containers das views
-    const mainContainer = document.querySelector('main'); 
-
+    const tabViews = document.querySelectorAll('.tab-view');
     menuLinks.forEach(link => {
-        link.addEventListener('click', async (e) => {
+        link.addEventListener('click', e => {
             e.preventDefault();
-            if (link.id === 'logout-button') return;
-
+            if (link.id === 'logout-button') return; // O logout é tratado em auth.js
             const targetTab = link.dataset.tab;
-            
-            // Lógica para carregar o HTML da view
-            try {
-                const response = await fetch(`views/${targetTab}.html`);
-                if (!response.ok) throw new Error('View não encontrada.');
-                const viewHtml = await response.text();
-                mainContainer.innerHTML = viewHtml;
-
-                // Ativa o link do menu e remove a classe de outros
-                menuLinks.forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-                
-                // Re-inicializa os event listeners específicos da view
-                app.reinitializeViewEventListeners(targetTab);
-                
-            } catch (error) {
-                console.error('Erro ao carregar a view:', error);
-                mainContainer.innerHTML = `<p class="text-red-500 text-center">Erro ao carregar conteúdo.</p>`;
-            }
+            menuLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            tabViews.forEach(view => view.classList.toggle('active', view.id === `${targetTab}-view`));
         });
     });
 
-    // Dispara o clique no primeiro link para carregar a view inicial
-    document.querySelector('.menu-link[data-tab="relatorio-rt"]').click();
+    // --- DELEGAÇÃO DE EVENTOS DE CLIQUE ---
+    mainContainer.addEventListener('click', (e) => {
+        const target = e.target;
 
-    // --- Sidebar Toggle ---
-    const sidebar = document.getElementById('app-sidebar');
-    const toggleButton = document.getElementById('sidebar-toggle-btn');
-    if (toggleButton && sidebar) {
-        toggleButton.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-        });
-    }
-}
+        // Ações gerais
+        if (target.closest('#sidebar-toggle-btn')) document.getElementById('app-sidebar').classList.toggle('collapsed');
+        if (target.closest('#calculate-results-btn')) app.renderResultados();
 
-// Função para (re)adicionar listeners específicos de cada view
-function reinitializeViewEventListeners(viewName, app) {
-    // Listeners Globais para Modais (eles existem fora das views)
-    document.getElementById('confirm-rt-mapping-btn')?.addEventListener('click', app.handleRtMapping.bind(app));
-    document.getElementById('cancel-rt-mapping-btn')?.addEventListener('click', app.closeRtMappingModal.bind(app));
-    document.getElementById('edit-arquiteto-form')?.addEventListener('submit', app.handleEditArquiteto.bind(app));
-    document.getElementById('close-edit-modal-x-btn')?.addEventListener('click', app.closeEditModal.bind(app));
-    document.getElementById('gerar-pagamento-ficha-btn')?.addEventListener('click', app.handleGerarPagamentoFicha.bind(app));
-    document.getElementById('consultar-vendas-btn')?.addEventListener('click', app.handleConsultarVendasClick.bind(app));
-    document.getElementById('consultar-vendas-sysled-btn')?.addEventListener('click', app.handleConsultarVendasSysledClick.bind(app));
-    document.getElementById('add-value-form')?.addEventListener('submit', app.handleAddValue.bind(app));
-    document.getElementById('cancel-add-value-btn')?.addEventListener('click', app.closeAddValueModal.bind(app));
-    document.getElementById('confirm-arquiteto-mapping-btn')?.addEventListener('click', app.handleArquitetoMapping.bind(app));
-    document.getElementById('cancel-arquiteto-mapping-btn')?.addEventListener('click', app.closeArquitetoMappingModal.bind(app));
-    document.getElementById('cancel-gerar-pagamentos-btn')?.addEventListener('click', () => document.getElementById('gerar-pagamentos-modal').classList.remove('flex'));
-    document.getElementById('confirmar-geracao-comprovantes-btn')?.addEventListener('click', app.confirmarGeracaoComprovantes.bind(app));
-    document.getElementById('close-comprovante-modal-btn')?.addEventListener('click', app.closeComprovanteModal.bind(app));
-    document.getElementById('edit-rt-form')?.addEventListener('submit', app.handleUpdateRtValue.bind(app));
-    document.getElementById('cancel-edit-rt-btn')?.addEventListener('click', app.closeEditRtModal.bind(app));
-    document.getElementById('sales-history-table-container')?.addEventListener('click', app.handleSalesHistoryTableClick.bind(app));
-    document.getElementById('close-sales-history-btn')?.addEventListener('click', app.closeSalesHistoryModal.bind(app));
-    document.getElementById('close-sale-details-btn')?.addEventListener('click', app.closeSaleDetailsModal.bind(app));
-    document.getElementById('import-single-sale-btn')?.addEventListener('click', app.handleImportSingleSale.bind(app));
-    document.getElementById('close-comissao-manual-details-btn')?.addEventListener('click', app.closeComissaoManualDetailsModal.bind(app));
+        // Ações da aba Arquitetos e Modais relacionados
+        if (target.closest('.edit-btn')) app.handleArquitetosTableClick(e);
+        if (target.closest('.delete-btn')) app.handleArquitetosTableClick(e);
+        if (target.closest('.add-value-btn')) app.handleArquitetosTableClick(e);
+        if (target.closest('.id-link')) { e.preventDefault(); app.handleArquitetosTableClick(e); }
+        if (target.closest('.sortable-header')) app.handleSort(e);
+        if (target.closest('#export-csv-btn')) app.exportArquitetosCSV();
+        if (target.closest('#delete-all-arquitetos-btn')) app.deleteAllArquitetos();
+        if (target.closest('#gerar-pagamentos-rt-btn')) app.handleGerarPagamentosClick();
+        if (target.closest('#close-edit-modal-x-btn')) app.closeEditModal();
+        if (target.closest('#gerar-pagamento-ficha-btn')) app.handleGerarPagamentoFicha();
+        if (target.closest('#consultar-vendas-btn')) app.handleConsultarVendasClick(e);
+        if (target.closest('#consultar-vendas-sysled-btn')) app.handleConsultarVendasSysledClick(e);
+        if (target.closest('#cancel-add-value-btn')) app.closeAddValueModal();
+        if (target.closest('#cancel-arquiteto-mapping-btn')) app.closeArquitetoMappingModal();
+        if (target.closest('#confirm-arquiteto-mapping-btn')) app.handleArquitetoMapping();
+        
+        // Ações de importação de vendas (RT)
+        if (target.closest('#cancel-rt-mapping-btn')) app.closeRtMappingModal();
+        if (target.closest('#confirm-rt-mapping-btn')) app.handleRtMapping();
 
+        // Ações da aba Comprovantes e Modais relacionados
+        if (target.closest('.view-comprovante-btn')) app.handlePagamentosClick(e);
+        if (target.closest('.delete-pagamentos-btn')) app.handlePagamentosClick(e);
+        if (target.closest('.download-xlsx-btn')) app.handlePagamentosClick(e);
+        if (target.closest('.gerar-relatorio-btn')) app.handlePagamentosClick(e);
+        if (target.closest('.edit-rt-btn')) app.handlePagamentosClick(e);
+        if (target.closest('#close-comprovante-modal-btn')) app.closeComprovanteModal();
+        if (target.closest('#cancel-edit-rt-btn')) app.closeEditRtModal();
+        if (target.closest('#cancel-gerar-pagamentos-btn')) document.getElementById('gerar-pagamentos-modal').classList.remove('flex');
+        if (target.closest('#confirmar-geracao-comprovantes-btn')) app.confirmarGeracaoComprovantes();
 
-    // Listeners Específicos por View
-    switch (viewName) {
-        case 'relatorio-rt':
-            document.getElementById('rt-file-input')?.addEventListener('change', app.handleRTFileSelect.bind(app));
-            break;
-        case 'consulta-sysled':
-            document.getElementById('sysled-refresh-btn')?.addEventListener('click', app.fetchSysledData.bind(app));
-            document.getElementById('sysled-filter-btn')?.addEventListener('click', app.renderSysledTable.bind(app));
-            document.getElementById('sysled-clear-filter-btn')?.addEventListener('click', () => {
-                document.getElementById('sysled-filter-data-inicio').value = '';
-                document.getElementById('sysled-filter-data-fim').value = '';
-                document.getElementById('sysled-filter-parceiro').value = '';
-                document.getElementById('sysled-filter-excluir-parceiro').value = '';
-                app.renderSysledTable();
-            });
-            document.getElementById('copy-to-rt-btn')?.addEventListener('click', app.handleCopyToRTClick.bind(app));
-            document.getElementById('sysled-table-container')?.addEventListener('input', (e) => {
-                if (e.target.classList.contains('sysled-column-filter')) {
-                    app.renderSysledTable();
-                }
-            });
-            app.renderSysledTable(); // Renderiza a tabela caso já existam dados
-            break;
-        case 'inclusao-manual':
-            document.getElementById('add-comissao-manual-form')?.addEventListener('submit', app.handleAddComissaoManual.bind(app));
-            document.getElementById('historico-manual-container')?.addEventListener('click', app.handleHistoricoManualClick.bind(app));
-            app.renderHistoricoManual();
-            break;
-        case 'arquitetos':
-            document.getElementById('add-arquiteto-form')?.addEventListener('submit', app.handleAddArquiteto.bind(app));
-            document.getElementById('arquiteto-file-input')?.addEventListener('change', app.handleArquitetoFileUpload.bind(app));
-            document.getElementById('arquitetos-table-container')?.addEventListener('click', app.handleArquitetosTableClick.bind(app));
-            document.getElementById('export-csv-btn')?.addEventListener('click', app.exportArquitetosCSV.bind(app));
-            document.getElementById('delete-all-arquitetos-btn')?.addEventListener('click', app.deleteAllArquitetos.bind(app));
-            document.getElementById('arquiteto-search-input')?.addEventListener('input', () => app.renderArquitetosTable());
-            document.getElementById('gerar-pagamentos-rt-btn')?.addEventListener('click', app.handleGerarPagamentosClick.bind(app));
-            document.getElementById('arquitetos-table-container')?.addEventListener('click', app.handleSort.bind(app));
-            app.renderArquitetosTable();
-            break;
-        case 'pontuacao':
-            document.getElementById('add-pontos-form')?.addEventListener('submit', app.handleAddPontos.bind(app));
-            app.renderRankingTable();
-            app.populateArquitetoSelect();
-            break;
-        case 'comprovantes':
-            const pagamentosContainer = document.getElementById('pagamentos-container');
-            pagamentosContainer?.addEventListener('change', app.handlePagamentosChange.bind(app));
-            pagamentosContainer?.addEventListener('click', app.handlePagamentosClick.bind(app));
-            document.getElementById('pagamento-search-input')?.addEventListener('input', (e) => app.renderPagamentos(e.target.value.trim()));
-            app.renderPagamentos();
-            break;
-        case 'arquivos-importados':
-            document.getElementById('arquivos-importados-container')?.addEventListener('click', app.handleArquivosImportadosClick.bind(app));
-            app.renderArquivosImportados();
-            break;
-        case 'resultados':
-            document.getElementById('calculate-results-btn')?.addEventListener('click', app.renderResultados.bind(app));
-            app.renderResultados();
-            break;
-    }
+        // Ações da aba Arquivos Importados
+        if (target.closest('.download-arquivo-btn')) app.handleArquivosImportadosClick(e);
+
+        // Ações da aba Consulta Sysled e Modais relacionados
+        if (target.closest('#sysled-refresh-btn')) app.fetchSysledData();
+        if (target.closest('#sysled-filter-btn')) app.renderSysledTable();
+        if (target.closest('#sysled-clear-filter-btn')) app.clearSysledFilters();
+        if (target.closest('#copy-to-rt-btn')) app.handleCopyToRTClick();
+        if (target.closest('.view-sale-details-btn')) { e.preventDefault(); app.handleSalesHistoryTableClick(e); }
+        if (target.closest('#close-sales-history-btn')) app.closeSalesHistoryModal();
+        if (target.closest('#import-single-sale-btn')) app.handleImportSingleSale(e);
+        if (target.closest('#close-sale-details-btn')) app.closeSaleDetailsModal();
+        
+        // Ações da aba Inclusão Manual e Modais relacionados
+        if (target.closest('.view-comissao-details-btn')) { e.preventDefault(); app.handleHistoricoManualClick(e); }
+        if (target.closest('#close-comissao-manual-details-btn')) app.closeComissaoManualDetailsModal();
+    });
+
+    // --- DELEGAÇÃO DE EVENTOS DE SUBMISSÃO (FORMULÁRIOS) ---
+    mainContainer.addEventListener('submit', (e) => {
+        e.preventDefault(); // Impede o comportamento padrão de todos os formulários
+        switch (e.target.id) {
+            case 'add-comissao-manual-form': app.handleAddComissaoManual(e); break;
+            case 'add-arquiteto-form': app.handleAddArquiteto(e); break;
+            case 'edit-arquiteto-form': app.handleEditArquiteto(e); break;
+            case 'add-value-form': app.handleAddValue(e); break;
+            case 'add-pontos-form': app.handleAddPontos(e); break;
+            case 'edit-rt-form': app.handleUpdateRtValue(e); break;
+        }
+    });
+    
+    // --- DELEGAÇÃO DE EVENTOS DE INPUT E CHANGE ---
+    mainContainer.addEventListener('input', (e) => {
+        switch (e.target.id) {
+            case 'arquiteto-search-input': app.renderArquitetosTable(); break;
+            case 'pagamento-search-input': app.renderPagamentos(e.target.value.trim()); break;
+        }
+        if (e.target.classList.contains('sysled-column-filter')) app.renderSysledTable();
+    });
+    
+    mainContainer.addEventListener('change', (e) => {
+        switch (e.target.id) {
+            case 'rt-file-input': app.handleRTFileSelect(e); break;
+            case 'arquiteto-file-input': app.handleArquitetoFileUpload(e); break;
+            case 'rt-percentual': app.calculateRT(); break;
+        }
+        if (e.target.matches('.pagamento-status, .comprovante-input')) {
+            app.handlePagamentosChange(e);
+        }
+    });
+
+    console.log("Event listeners configurados.");
 }

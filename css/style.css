@@ -2,24 +2,33 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: #f8f9fa;
 }
+
+/* Estilos da Sidebar */
 .app-sidebar {
     background-color: #1a1a1a;
     transition: width 0.3s ease-in-out;
 }
+
 .menu-link.active {
     background-color: #10b981; /* emerald-500 */
     color: #ffffff;
 }
+
 .menu-link:hover {
     background-color: #333;
     color: #ffffff;
 }
+
+/* Estilos para ocultar/mostrar views (gerenciado por JS) */
 .tab-view {
     display: none;
 }
+
 .tab-view.active {
     display: block;
 }
+
+/* Estilos para o input de arquivo customizado */
 .file-input-label {
     cursor: pointer;
     display: inline-flex;
@@ -31,41 +40,50 @@ body {
     font-weight: 600;
     transition: background-color 0.3s;
 }
+
 .file-input {
-    display: none;
-}
-.modal {
-    display: none;
-}
-.modal.flex {
-    display: flex;
-}
-#auth-container, #app-container {
-    display: none; /* Escondidos por padrão */
+    display: none; /* Oculta o input de arquivo nativo */
 }
 
-/* Sidebar Collapse Styles */
+/* Estilos para Modais */
+.modal {
+    display: none; /* Oculto por padrão */
+}
+
+.modal.flex {
+    display: flex; /* Exibe o modal quando a classe 'flex' é adicionada via JS */
+}
+
+/* Esconde containers de autenticação e app por padrão (gerenciado por JS) */
+#auth-container, #app-container {
+    display: none;
+}
+
+/* Estilos para Sidebar Recolhida */
 .app-sidebar.collapsed {
     width: 5rem; /* 80px */
 }
+
 .app-sidebar.collapsed .sidebar-header span,
 .app-sidebar.collapsed .menu-link span,
 .app-sidebar.collapsed .menu-title {
     display: none;
-    opacity: 0;
+    opacity: 0; /* Garante que o texto não apareça durante a transição */
 }
+
 .app-sidebar.collapsed .sidebar-header {
     padding-bottom: 2rem;
 }
-.app-sidebar.collapsed .sidebar-header a {
-    justify-content: center;
-}
+
+.app-sidebar.collapsed .sidebar-header a,
 .app-sidebar.collapsed .menu-link {
-    justify-content: center;
+    justify-content: center; /* Centraliza ícones quando recolhido */
 }
+
 #sidebar-toggle-btn i {
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out; /* Transição para a seta do toggle */
 }
+
 .app-sidebar.collapsed #sidebar-toggle-btn i {
-    transform: rotate(180deg);
+    transform: rotate(180deg); /* Gira a seta quando recolhido */
 }
