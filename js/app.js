@@ -9,9 +9,11 @@ class RelacionamentoApp {
         this.pagamentos = {};
         this.importedFiles = {};
         this.comissoesManuais = [];
+        this.actionLogs = []; // Para armazenar os logs de eventos
         this.tempRTData = [];
         this.tempArquitetoData = [];
         this.eligibleForPayment = [];
+        this.currentUserEmail = ''; // Para armazenar o email do usuário logado
         
         // Flags para funcionalidades condicionais baseadas no schema do DB
         this.schemaHasRtAcumulado = false;
@@ -33,6 +35,10 @@ class RelacionamentoApp {
      * Inicializa a aplicação, carregando dados e configurando os event listeners.
      */
     async init() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            this.currentUserEmail = session.user.email;
+        }
         await this.loadData();
         initializeEventListeners(this);
         this.renderAll();
@@ -44,11 +50,12 @@ class RelacionamentoApp {
     async loadData() {
         console.log("Carregando dados do Supabase...");
         
-        const [arqRes, pagRes, filesRes, comissoesRes] = await Promise.all([
+        const [arqRes, pagRes, filesRes, comissoesRes, logsRes] = await Promise.all([
             supabase.from('arquitetos').select('*'),
             supabase.from('pagamentos').select('*'),
             supabase.from('arquivos_importados').select('*'),
-            supabase.from('comissoes_manuais').select('*').order('created_at', { ascending: false })
+            supabase.from('comissoes_manuais').select('*').order('created_at', { ascending: false }),
+            supabase.from('action_logs').select('*').order('when_did', { ascending: false }) // Carrega os logs
         ]);
 
         if (arqRes.error) console.error('Erro ao carregar arquitetos:', arqRes.error);
@@ -84,6 +91,10 @@ class RelacionamentoApp {
         if (comissoesRes.error) console.error('Erro ao carregar comissões manuais:', comissoesRes.error);
         else this.comissoesManuais = comissoesRes.data || [];
 
+        // Processa os logs de eventos
+        if (logsRes.error) console.error('Erro ao carregar logs de eventos:', logsRes.error);
+        else this.actionLogs = logsRes.data || [];
+
         console.log("Dados carregados.");
     }
         
@@ -98,6 +109,7 @@ class RelacionamentoApp {
         this.renderArquivosImportados();
         this.renderHistoricoManual();
         this.renderResultados();
+        this.renderEventosLog(); // Renderiza a tabela de logs
         this.checkPaymentFeature();
         console.log("Todos os componentes foram renderizados.");
     }
@@ -323,6 +335,41 @@ class RelacionamentoApp {
         container.innerHTML = `<table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID Pedido</th><th class="p-2 text-right">Valor da Nota</th><th class="p-2 text-center">Data da Venda</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
     }
     
+    // NOVO: Renderiza a tabela de logs de eventos
+    renderEventosLog() {
+        const container = document.getElementById('eventos-log-container');
+        if (!container) return;
+
+        if (this.actionLogs.length === 0) {
+            container.innerHTML = `<p class="text-center text-gray-500 py-8">Nenhum evento registrado.</p>`;
+            return;
+        }
+
+        const rowsHtml = this.actionLogs.map(log => {
+            const timestamp = new Date(log.when_did).toLocaleString('pt-BR');
+            return `
+                <tr class="border-b text-sm">
+                    <td class="p-2">${log.who_did}</td>
+                    <td class="p-2">${log.what_did}</td>
+                    <td class="p-2">${timestamp}</td>
+                </tr>
+            `;
+        }).join('');
+
+        container.innerHTML = `
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-100 text-xs uppercase">
+                        <th class="p-2 text-left">Usuário</th>
+                        <th class="p-2 text-left">Ação</th>
+                        <th class="p-2 text-left">Quando</th>
+                    </tr>
+                </thead>
+                <tbody>${rowsHtml}</tbody>
+            </table>
+        `;
+    }
+
     checkPaymentFeature() {
         const btn = document.getElementById('gerar-pagamentos-rt-btn');
         if (!btn) return;
@@ -482,6 +529,17 @@ class RelacionamentoApp {
     }
     
     // --- MÉTODOS DE LÓGICA DE NEGÓCIO E MANIPULAÇÃO DE DADOS ---
+
+    // NOVO: Função para registrar uma ação no log de eventos
+    async logAction(actionDescription) {
+        const { error } = await supabase.from('action_logs').insert({
+            who_did: this.currentUserEmail,
+            what_did: actionDescription
+        });
+        if (error) {
+            console.error('Erro ao registrar ação no log:', error);
+        }
+    }
     
     handleArquitetosTableClick(e) {
         const idLink = e.target.closest('.id-link');
@@ -565,7 +623,10 @@ class RelacionamentoApp {
         if (fileToSave) {
             const { data: fileData, error } = await supabase.from('arquivos_importados').insert({ data_importacao: todayDB, name: fileToSave.name, dataUrl: fileToSave.dataUrl }).select().single();
             if (error) console.error("Erro ao salvar arquivo:", error);
-            else this.importedFiles[todayKey] = { name: fileData.name, dataUrl: fileData.dataUrl, id: fileData.id };
+            else {
+                this.importedFiles[todayKey] = { name: fileData.name, dataUrl: fileData.dataUrl, id: fileData.id };
+                await this.logAction(`Importou o arquivo: ${fileToSave.name}`);
+            }
         }
 
         const architectUpdates = {};
@@ -580,6 +641,7 @@ class RelacionamentoApp {
                 if (error) { console.error(`Erro ao criar arquiteto ${partnerId}:`, error); continue; }
                 this.arquitetos.push(created);
                 arquiteto = created;
+                await this.logAction(`Criou novo arquiteto (ID: ${partnerId}) via importação.`);
             }
             if (!architectUpdates[partnerId]) architectUpdates[partnerId] = { valorVendasTotal: arquiteto.valorVendasTotal || 0, salesCount: arquiteto.salesCount || 0, pontos: arquiteto.pontos || 0, rt_acumulado: parseFloat(arquiteto.rt_acumulado || 0) };
             architectUpdates[partnerId].valorVendasTotal += valorVenda;
@@ -597,13 +659,15 @@ class RelacionamentoApp {
     async handleAddArquiteto(e) {
         e.preventDefault();
         const id = document.getElementById('arquiteto-id').value;
+        const nome = document.getElementById('arquiteto-nome').value;
         if (this.arquitetos.some(a => a.id === id)) { alert('ID já existe.'); return; }
-        const newArquiteto = { id, nome: document.getElementById('arquiteto-nome').value, email: document.getElementById('arquiteto-email').value, telefone: document.getElementById('arquiteto-telefone').value, pix: document.getElementById('arquiteto-pix').value, salesCount: 0, valorVendasTotal: 0, pontos: 0, rtPercentual: 0.05, rt_acumulado: 0, rt_total_pago: 0 };
+        const newArquiteto = { id, nome, email: document.getElementById('arquiteto-email').value, telefone: document.getElementById('arquiteto-telefone').value, pix: document.getElementById('arquiteto-pix').value, salesCount: 0, valorVendasTotal: 0, pontos: 0, rtPercentual: 0.05, rt_acumulado: 0, rt_total_pago: 0 };
         const { data, error } = await supabase.from('arquitetos').insert(newArquiteto).select().single();
         if (error) { alert('Erro: ' + error.message); }
         else {
             this.arquitetos.push(data);
             this.pontuacoes[data.id] = data.pontos;
+            await this.logAction(`Adicionou o arquiteto: ${nome} (ID: ${id})`);
             this.renderAll();
             e.target.reset();
         }
@@ -636,6 +700,7 @@ class RelacionamentoApp {
             if (error) { alert("Erro ao importar: " + error.message); }
             else {
                 alert(`${novosArquitetos.length} novos arquitetos importados.`);
+                await this.logAction(`Importou ${novosArquitetos.length} novos arquitetos via planilha.`);
                 await this.loadData();
                 this.renderAll();
             }
@@ -664,18 +729,22 @@ class RelacionamentoApp {
         else {
             const index = this.arquitetos.findIndex(a => a.id === originalId);
             this.arquitetos[index] = { ...this.arquitetos[index], ...data };
+            await this.logAction(`Editou o arquiteto: ${updatedData.nome} (ID: ${originalId})`);
             this.renderAll();
             this.closeEditModal();
         }
     }
 
     async deleteArquiteto(id) {
-        if (confirm(`Tem certeza que deseja apagar o arquiteto com ID ${id}?`)) {
+        const arq = this.arquitetos.find(a => a.id === id);
+        if (!arq) return;
+        if (confirm(`Tem certeza que deseja apagar o arquiteto ${arq.nome} (ID: ${id})?`)) {
             const { error } = await supabase.from('arquitetos').delete().eq('id', id);
             if (error) { alert("Erro ao apagar: " + error.message); }
             else {
                 this.arquitetos = this.arquitetos.filter(a => a.id !== id);
                 delete this.pontuacoes[id];
+                await this.logAction(`Apagou o arquiteto: ${arq.nome} (ID: ${id})`);
                 this.renderAll();
             }
         }
@@ -691,7 +760,10 @@ class RelacionamentoApp {
             ]);
             const errors = [arq.error, pag.error, file.error, comiss.error].filter(Boolean);
             if (errors.length > 0) alert("Ocorreram erros: " + errors.map(e => e.message).join('\n'));
-            else alert('Todos os dados foram apagados com sucesso.');
+            else {
+                alert('Todos os dados foram apagados com sucesso.');
+                await this.logAction(`APAGOU TODOS OS DADOS DO SISTEMA.`);
+            }
             await this.loadData();
             this.renderAll();
         }
@@ -709,6 +781,7 @@ class RelacionamentoApp {
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Arquitetos");
         XLSX.writeFile(wb, "cadastro_arquitetos.xlsx");
+        this.logAction("Exportou a lista de arquitetos para CSV.");
     }
 
     async handleAddValue(e) {
@@ -729,6 +802,7 @@ class RelacionamentoApp {
                 const index = this.arquitetos.findIndex(a => a.id === id);
                 this.arquitetos[index] = data;
                 this.pontuacoes[id] = data.pontos;
+                await this.logAction(`Adicionou venda manual de ${formatCurrency(value)} para ${arq.nome} (ID: ${id})`);
                 this.renderAll();
                 this.closeAddValueModal();
             }
@@ -747,6 +821,7 @@ class RelacionamentoApp {
             else {
                 this.pontuacoes[id] = newPoints;
                 arq.pontos = newPoints;
+                await this.logAction(`Ajustou ${pontos} pontos para ${arq.nome} (ID: ${id})`);
                 this.renderRankingTable();
                 e.target.reset();
             }
@@ -787,6 +862,7 @@ class RelacionamentoApp {
             if (error) alert("Erro: " + error.message);
             else {
                 pagamento.pago = isChecked;
+                await this.logAction(`Marcou pagamento (ID: ${pagamentoId}) para ${pagamento.parceiro} como ${isChecked ? 'PAGO' : 'NÃO PAGO'}.`);
                 this.renderResultados();
             }
         }
@@ -800,7 +876,10 @@ class RelacionamentoApp {
             pagamento.comprovante = { name: file.name, url: dataUrl };
             const { error } = await supabase.from('pagamentos').update({ comprovante: pagamento.comprovante }).eq('id', pagamento.id);
             if(error) alert("Erro: " + error.message);
-            else this.renderPagamentos();
+            else {
+                await this.logAction(`Anexou comprovante para o pagamento (ID: ${pagamentoId}) de ${pagamento.parceiro}.`);
+                this.renderPagamentos();
+            }
         }
     }
     
@@ -811,6 +890,7 @@ class RelacionamentoApp {
             if (error) { alert("Erro: " + error.message); }
             else {
                 delete this.pagamentos[date];
+                await this.logAction(`Apagou o lote de pagamentos gerado em ${date}.`);
                 this.renderPagamentos();
             }
         }
@@ -824,10 +904,12 @@ class RelacionamentoApp {
         if (isNaN(newValue) || newValue < 0) { alert('Valor inválido.'); return; }
         const pagamento = this.pagamentos[date]?.find(p => p.id.toString() === id);
         if (pagamento) {
+            const oldValue = pagamento.rt_valor;
             const { error } = await supabase.from('pagamentos').update({ rt_valor: newValue }).eq('id', pagamento.id);
             if (error) { alert("Erro: " + error.message); }
             else {
                 pagamento.rt_valor = newValue;
+                await this.logAction(`Alterou valor do RT (ID: ${id}) de ${formatCurrency(oldValue)} para ${formatCurrency(newValue)}.`);
                 this.renderPagamentos();
                 this.renderResultados();
                 this.closeEditRtModal();
@@ -844,6 +926,7 @@ class RelacionamentoApp {
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Pagamentos");
         XLSX.writeFile(wb, `Pagamentos_${date.replace(/\//g, '-')}.xlsx`);
+        this.logAction(`Exportou o relatório de pagamentos de ${date}.`);
     }
 
     generatePagamentoPrint(date) {
@@ -878,6 +961,7 @@ class RelacionamentoApp {
         const updates = this.eligibleForPayment.map(a => supabase.from('arquitetos').update({ rt_acumulado: 0, rt_total_pago: (parseFloat(a.rt_total_pago) || 0) + (parseFloat(a.rt_acumulado) || 0) }).eq('id', a.id));
         await Promise.all(updates);
         alert(`${this.eligibleForPayment.length} comprovantes gerados!`);
+        await this.logAction(`Gerou ${this.eligibleForPayment.length} pagamentos em lote.`);
         document.getElementById('gerar-pagamentos-modal').classList.remove('flex');
         this.eligibleForPayment = [];
         await this.loadData();
@@ -897,7 +981,10 @@ class RelacionamentoApp {
             if (insertError) { alert("Erro ao gerar comprovante: " + insertError.message); return; }
             const { error: updateError } = await supabase.from('arquitetos').update({ rt_acumulado: 0, rt_total_pago: (parseFloat(arq.rt_total_pago) || 0) + valor }).eq('id', arq.id);
             if (updateError) alert("Comprovante gerado, mas erro ao atualizar saldo: " + updateError.message);
-            else alert(`Comprovante gerado com sucesso para ${arq.nome}!`);
+            else {
+                alert(`Comprovante gerado com sucesso para ${arq.nome}!`);
+                await this.logAction(`Gerou pagamento individual de ${formatCurrency(valor)} para ${arq.nome} (ID: ${id}).`);
+            }
             this.closeEditModal();
             await this.loadData();
             this.renderAll();
@@ -912,6 +999,7 @@ class RelacionamentoApp {
             const response = await fetch('https://integration.sysled.com.br/n8n/api/?v_crm_oportunidades_propostas_up180dd=null', { headers: { 'Authorization': 'e4b6f9082f1b8a1f37ad5b56e637f3ec719ec8f0b6acdd093972f9c5bb29b9ed' } });
             if (!response.ok) throw new Error(`Erro na API: ${response.statusText}`);
             this.sysledData = await response.json();
+            await this.logAction("Atualizou os dados da consulta Sysled.");
         } catch (error) {
             console.error("Erro na API Sysled:", error);
             container.innerHTML = `<p class="text-center text-red-500 py-8">Erro ao carregar dados da API.</p>`;
@@ -1115,7 +1203,10 @@ class RelacionamentoApp {
         if (this.schemaHasRtAcumulado) payload.rt_acumulado = parseFloat(arq.rt_acumulado || 0) + (valorVenda * (arq.rtPercentual || 0.05));
         const { error: updateError } = await supabase.from('arquitetos').update(payload).eq('id', idParceiro);
         if (updateError) alert("Comissão salva, mas erro ao atualizar arquiteto: " + updateError.message);
-        else alert('Comissão manual adicionada com sucesso!');
+        else {
+            alert('Comissão manual adicionada com sucesso!');
+            await this.logAction(`Adicionou comissão manual de ${formatCurrency(valorVenda)} para ${arq.nome} (ID: ${idParceiro})`);
+        }
         if (idVenda) {
             const { error } = await supabase.from('sysled_imports').insert({ id_parceiro: idParceiro, valor_nota: valorVenda, data_finalizacao_prevenda: document.getElementById('manual-data-venda').value, id_pedido: idVenda });
             if (error) alert("Erro ao registrar na tabela de controle (sysled_imports).");
@@ -1128,6 +1219,21 @@ class RelacionamentoApp {
     handleHistoricoManualClick(e) {
         const btn = e.target.closest('.view-comissao-details-btn');
         if (btn) { e.preventDefault(); this.openComissaoManualDetailsModal(parseInt(btn.dataset.comissaoId, 10)); }
+    }
+
+    // NOVO: Limpa todos os logs de eventos
+    async clearEventsLog() {
+        if (confirm('Tem certeza que deseja apagar TODOS os logs de eventos? Esta ação é irreversível.')) {
+            const { error } = await supabase.from('action_logs').delete().neq('id', 0); // Deleta todos os registros
+            if (error) {
+                alert('Erro ao limpar o log de eventos: ' + error.message);
+            } else {
+                alert('Log de eventos limpo com sucesso.');
+                await this.logAction('Limpou todo o log de eventos.');
+                await this.loadData(); // Recarrega os dados (agora vazios)
+                this.renderEventosLog(); // Re-renderiza a tabela
+            }
+        }
     }
 }
 
