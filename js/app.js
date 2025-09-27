@@ -1205,11 +1205,47 @@ class RelacionamentoApp {
         e.preventDefault();
         const form = e.target;
         const idParceiro = document.getElementById('manual-id-parceiro').value.trim();
+        const idVenda = document.getElementById('manual-id-venda').value.trim();
         const valorVenda = parseFloat(document.getElementById('manual-valor-venda').value);
 
         if (!idParceiro || isNaN(valorVenda) || valorVenda <= 0) {
             alert('Preencha o ID do Parceiro e um Valor de Venda válido.');
             return;
+        }
+
+        // Verificação de duplicidade ANTES de criar a solicitação
+        if (idVenda) {
+            // 1. Checa se já foi importado via Sysled
+            const { data: existingImport, error: importError } = await supabase
+                .from('sysled_imports')
+                .select('id_pedido')
+                .eq('id_pedido', idVenda)
+                .maybeSingle();
+            
+            if (importError) {
+                alert('Erro ao verificar duplicidade de importação: ' + importError.message);
+                return;
+            }
+            if (existingImport) {
+                alert(`Venda com ID ${idVenda} já foi importada anteriormente e não pode ser incluída manualmente.`);
+                return;
+            }
+
+            // 2. Checa se já existe uma comissão manual com o mesmo ID de venda
+            const { data: existingManual, error: manualError } = await supabase
+                .from('comissoes_manuais')
+                .select('id')
+                .eq('id_venda', idVenda)
+                .maybeSingle();
+            
+            if (manualError) {
+                alert('Erro ao verificar duplicidade de comissão manual: ' + manualError.message);
+                return;
+            }
+            if (existingManual) {
+                alert(`Já existe uma inclusão manual para a venda com ID ${idVenda}.`);
+                return;
+            }
         }
 
         const arq = this.arquitetos.find(a => a.id === idParceiro);
@@ -1220,7 +1256,7 @@ class RelacionamentoApp {
 
         const newComissao = {
             id_parceiro: idParceiro,
-            id_venda: document.getElementById('manual-id-venda').value.trim(),
+            id_venda: idVenda,
             valor_venda: valorVenda,
             data_venda: document.getElementById('manual-data-venda').value,
             consultor: document.getElementById('manual-consultor').value,
@@ -1255,6 +1291,25 @@ class RelacionamentoApp {
         if (comissao.status === 'aprovada') {
             alert('Esta comissão já foi aprovada.'); return;
         }
+
+        // Verifica se a venda já foi importada antes de aprovar
+        if (comissao.id_venda) {
+            const { data: existingSale, error: checkError } = await supabase
+                .from('sysled_imports')
+                .select('id_pedido')
+                .eq('id_pedido', comissao.id_venda)
+                .maybeSingle();
+
+            if (checkError) {
+                alert('Erro ao verificar a existência da venda: ' + checkError.message);
+                return;
+            }
+
+            if (existingSale) {
+                alert(`Não é possível aprovar. A venda com ID ${comissao.id_venda} já foi importada anteriormente.`);
+                return;
+            }
+        }
     
         if (!confirm(`Aprovar a inclusão de ${formatCurrency(comissao.valor_venda)} para o parceiro ${comissao.id_parceiro}?`)) return;
     
@@ -1284,16 +1339,13 @@ class RelacionamentoApp {
         }
     
         if (comissao.id_venda) {
-            const { data: existing } = await supabase.from('sysled_imports').select('id_pedido').eq('id_pedido', comissao.id_venda).maybeSingle();
-            if (!existing) {
-                const { error } = await supabase.from('sysled_imports').insert({ 
-                    id_parceiro: comissao.id_parceiro, 
-                    valor_nota: comissao.valor_venda, 
-                    data_finalizacao_prevenda: comissao.data_venda, 
-                    id_pedido: comissao.id_venda 
-                });
-                if (error) alert("Aviso: Erro ao registrar na tabela de controle de duplicados (sysled_imports).");
-            }
+            const { error } = await supabase.from('sysled_imports').insert({ 
+                id_parceiro: comissao.id_parceiro, 
+                valor_nota: comissao.valor_venda, 
+                data_finalizacao_prevenda: comissao.data_venda, 
+                id_pedido: comissao.id_venda 
+            });
+            if (error) alert("Aviso: Erro ao registrar na tabela de controle de duplicados (sysled_imports).");
         }
         
         alert('Comissão aprovada e valores contabilizados com sucesso!');
@@ -1326,3 +1378,4 @@ class RelacionamentoApp {
 }
 
 export default RelacionamentoApp;
+
