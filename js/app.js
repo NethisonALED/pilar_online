@@ -153,12 +153,12 @@ class RelacionamentoApp {
         const headerRtAcumulado = this.schemaHasRtAcumulado ? `<th class="p-2 text-right sortable-header cursor-pointer" data-sort="rt_acumulado">RT Acumulado ${getSortIcon('rt_acumulado')}</th>` : '';
         const headerRtTotal = this.schemaHasRtTotalPago ? `<th class="p-2 text-right sortable-header cursor-pointer" data-sort="rt_total_pago">Total Pago ${getSortIcon('rt_total_pago')}</th>` : '';
         const headerRow = `<tr class="bg-gray-100 text-xs uppercase">
-                            <th class="p-2 text-left sortable-header cursor-pointer" data-sort="id">ID ${getSortIcon('id')}</th>
-                            <th class="p-2 text-left sortable-header cursor-pointer" data-sort="nome">Nome ${getSortIcon('nome')}</th>
-                            <th class="p-2 text-center sortable-header cursor-pointer" data-sort="salesCount">Vendas ${getSortIcon('salesCount')}</th>
-                            <th class="p-2 text-right sortable-header cursor-pointer" data-sort="valorVendasTotal">Valor Vendas ${getSortIcon('valorVendasTotal')}</th>
-                            ${headerRtAcumulado}${headerRtTotal}
-                            <th class="p-2 text-center">Ações</th></tr>`;
+                                <th class="p-2 text-left sortable-header cursor-pointer" data-sort="id">ID ${getSortIcon('id')}</th>
+                                <th class="p-2 text-left sortable-header cursor-pointer" data-sort="nome">Nome ${getSortIcon('nome')}</th>
+                                <th class="p-2 text-center sortable-header cursor-pointer" data-sort="salesCount">Vendas ${getSortIcon('salesCount')}</th>
+                                <th class="p-2 text-right sortable-header cursor-pointer" data-sort="valorVendasTotal">Valor Vendas ${getSortIcon('valorVendasTotal')}</th>
+                                ${headerRtAcumulado}${headerRtTotal}
+                                <th class="p-2 text-center">Ações</th></tr>`;
 
         const rows = filteredArquitetos.map(a => {
             let cellRtAcumulado = '';
@@ -200,12 +200,12 @@ class RelacionamentoApp {
                 const rowsHtml = pagamentosDoDia.map(p => {
                     const hasComprovante = p.comprovante && p.comprovante.url;
                     return `<tr class="border-b text-sm">
-                            <td class="p-2">${p.id_parceiro}</td><td class="p-2">${p.parceiro}</td>
-                            <td class="p-2 text-right font-semibold">${formatCurrency(p.rt_valor)}<button class="edit-rt-btn text-blue-500 hover:text-blue-700 ml-2" title="Editar Valor RT" data-date="${date}" data-id="${p.id}"><i class="fas fa-edit fa-xs"></i></button></td>
-                            <td class="p-2 text-center"><input type="checkbox" class="pagamento-status h-5 w-5" data-date="${date}" data-id="${p.id}" ${p.pago ? 'checked' : ''}></td>
-                            <td class="p-2"><div class="flex items-center gap-2"><label for="comprovante-input-${p.id}" class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs py-1 px-3 rounded-md whitespace-nowrap">Anexar</label><input type="file" id="comprovante-input-${p.id}" class="comprovante-input file-input" data-date="${date}" data-id="${p.id}"><span class="file-status-text text-xs ${hasComprovante ? 'text-green-600 font-semibold' : 'text-gray-500'}">${hasComprovante ? 'Comprovante anexado' : 'Nenhum arquivo'}</span></div></td>
-                            <td class="p-2 text-center"><button class="view-comprovante-btn text-blue-600 hover:underline" data-date="${date}" data-id="${p.id}" ${!hasComprovante ? 'disabled' : ''} style="${!hasComprovante ? 'opacity: 0.5; cursor: not-allowed;' : ''}">Ver</button></td>
-                        </tr>`;
+                                <td class="p-2">${p.id_parceiro}</td><td class="p-2">${p.parceiro}</td>
+                                <td class="p-2 text-right font-semibold">${formatCurrency(p.rt_valor)}<button class="edit-rt-btn text-blue-500 hover:text-blue-700 ml-2" title="Editar Valor RT" data-date="${date}" data-id="${p.id}"><i class="fas fa-edit fa-xs"></i></button></td>
+                                <td class="p-2 text-center"><input type="checkbox" class="pagamento-status h-5 w-5" data-date="${date}" data-id="${p.id}" ${p.pago ? 'checked' : ''}></td>
+                                <td class="p-2"><div class="flex items-center gap-2"><label for="comprovante-input-${p.id}" class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs py-1 px-3 rounded-md whitespace-nowrap">Anexar</label><input type="file" id="comprovante-input-${p.id}" class="comprovante-input file-input" data-date="${date}" data-id="${p.id}"><span class="file-status-text text-xs ${hasComprovante ? 'text-green-600 font-semibold' : 'text-gray-500'}">${hasComprovante ? 'Comprovante anexado' : 'Nenhum arquivo'}</span></div></td>
+                                <td class="p-2 text-center"><button class="view-comprovante-btn text-blue-600 hover:underline" data-date="${date}" data-id="${p.id}" ${!hasComprovante ? 'disabled' : ''} style="${!hasComprovante ? 'opacity: 0.5; cursor: not-allowed;' : ''}">Ver</button></td>
+                            </tr>`;
                 }).join('');
                 container.innerHTML += `<div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Pagamentos Gerados em ${date}</h2><div class="flex items-center gap-2"><button class="gerar-relatorio-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Gerar Relatório</button><button class="download-xlsx-btn bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Baixar XLSX</button><button class="delete-pagamentos-btn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Excluir Lote</button></div></div><div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">Parceiro</th><th class="p-2 text-right">Valor RT</th><th class="p-2 text-center">Pago</th><th class="p-2 text-left">Anexar Comprovante</th><th class="p-2 text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`;
             }
@@ -250,10 +250,21 @@ class RelacionamentoApp {
         if (this.comissoesManuais.length === 0) {
             container.innerHTML = `<p class="text-center text-gray-500">Nenhuma comissão manual adicionada ainda.</p>`; return;
         }
-        const rowsHtml = this.comissoesManuais.map(c => `
-            <tr class="border-b text-sm"><td class="p-2">${c.id_parceiro}</td><td class="p-2"><a href="#" class="view-comissao-details-btn text-blue-600 hover:underline" data-comissao-id="${c.id}">${c.id_venda || 'N/A'}</a></td><td class="p-2">${formatApiDateToBR(c.data_venda)}</td><td class="p-2 text-right">${formatCurrency(c.valor_venda)}</td><td class="p-2" title="${c.justificativa}">${c.justificativa.substring(0, 30)}${c.justificativa.length > 30 ? '...' : ''}</td><td class="p-2">${c.consultor || ''}</td></tr>`
-        ).join('');
-        container.innerHTML = `<table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">ID Venda</th><th class="p-2 text-left">Data</th><th class="p-2 text-right">Valor</th><th class="p-2 text-left">Justificativa</th><th class="p-2 text-left">Consultor</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+        const rowsHtml = this.comissoesManuais.map(c => {
+            const status = c.status || 'pendente';
+            const statusColor = status === 'aprovada' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+            return `
+            <tr class="border-b text-sm">
+                <td class="p-2">${c.id_parceiro}</td>
+                <td class="p-2"><a href="#" class="view-comissao-details-btn text-blue-600 hover:underline" data-comissao-id="${c.id}">${c.id_venda || 'N/A'}</a></td>
+                <td class="p-2">${formatApiDateToBR(c.data_venda)}</td>
+                <td class="p-2 text-right">${formatCurrency(c.valor_venda)}</td>
+                <td class="p-2" title="${c.justificativa}">${c.justificativa.substring(0, 30)}${c.justificativa.length > 30 ? '...' : ''}</td>
+                <td class="p-2">${c.consultor || ''}</td>
+                <td class="p-2 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusColor}">${status}</span></td>
+            </tr>`
+        }).join('');
+        container.innerHTML = `<table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">ID Venda</th><th class="p-2 text-left">Data</th><th class="p-2 text-right">Valor</th><th class="p-2 text-left">Justificativa</th><th class="p-2 text-left">Consultor</th><th class="p-2 text-center">Status</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
     }
     
     renderResultados() {
@@ -499,6 +510,7 @@ class RelacionamentoApp {
         const comissao = this.comissoesManuais.find(c => c.id === comissaoId);
         if (!comissao) { alert('Detalhes da comissão não encontrados.'); return; }
         const arquiteto = this.arquitetos.find(a => a.id === comissao.id_parceiro);
+        const status = comissao.status || 'pendente';
         const content = [
             { label: 'ID Parceiro', value: comissao.id_parceiro },
             { label: 'Nome Parceiro', value: arquiteto ? arquiteto.nome : 'Não encontrado' },
@@ -506,9 +518,15 @@ class RelacionamentoApp {
             { label: 'Valor Venda', value: formatCurrency(comissao.valor_venda) },
             { label: 'Data Venda', value: formatApiDateToBR(comissao.data_venda) },
             { label: 'Consultor', value: comissao.consultor || 'N/A' },
-            { label: 'Justificativa', value: comissao.justificativa, pre: true }
-        ].map(item => `<div class="grid grid-cols-3 gap-2"><p class="font-semibold text-gray-600 col-span-1">${item.label}:</p><p class="col-span-2 ${item.pre ? 'whitespace-pre-wrap' : ''}">${item.value}</p></div>`).join('');
+            { label: 'Justificativa', value: comissao.justificativa, pre: true },
+            { label: 'Status', value: `<span class="px-2 py-1 text-xs font-semibold rounded-full ${status === 'aprovada' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${status}</span>` }
+        ].map(item => `<div class="grid grid-cols-3 gap-2"><p class="font-semibold text-gray-600 col-span-1">${item.label}:</p><div class="col-span-2 ${item.pre ? 'whitespace-pre-wrap' : ''}">${item.value}</div></div>`).join('');
         document.getElementById('comissao-manual-details-content').innerHTML = content;
+        
+        const approveBtn = document.getElementById('aprovar-inclusao-manual-btn');
+        approveBtn.dataset.comissaoId = comissaoId;
+        approveBtn.style.display = status === 'aprovada' ? 'none' : 'inline-block';
+
         document.getElementById('comissao-manual-details-modal').classList.add('flex');
     }
 
@@ -1187,31 +1205,101 @@ class RelacionamentoApp {
         e.preventDefault();
         const form = e.target;
         const idParceiro = document.getElementById('manual-id-parceiro').value.trim();
-        const idVenda = document.getElementById('manual-id-venda').value.trim();
         const valorVenda = parseFloat(document.getElementById('manual-valor-venda').value);
-        if (!idParceiro || isNaN(valorVenda) || valorVenda <= 0) { alert('Preencha o ID do Parceiro e um Valor de Venda válido.'); return; }
-        if (idVenda) {
-            const { data: existing } = await supabase.from('sysled_imports').select('id_pedido').eq('id_pedido', idVenda).maybeSingle();
-            if (existing) { alert(`Venda ${idVenda} já importada.`); return; }
+
+        if (!idParceiro || isNaN(valorVenda) || valorVenda <= 0) {
+            alert('Preencha o ID do Parceiro e um Valor de Venda válido.');
+            return;
         }
+
         const arq = this.arquitetos.find(a => a.id === idParceiro);
-        if (!arq) { alert(`Arquiteto com ID ${idParceiro} não encontrado.`); return; }
-        const newComissao = { id_parceiro: idParceiro, id_venda: idVenda, valor_venda: valorVenda, data_venda: document.getElementById('manual-data-venda').value, consultor: document.getElementById('manual-consultor').value, justificativa: document.getElementById('manual-justificativa').value };
-        const { error: comissaoError } = await supabase.from('comissoes_manuais').insert(newComissao);
-        if (comissaoError) { alert("Erro ao salvar comissão: " + comissaoError.message); return; }
-        const payload = { valorVendasTotal: (arq.valorVendasTotal || 0) + valorVenda, pontos: (this.pontuacoes[idParceiro] || 0) + Math.floor(valorVenda / 1000), salesCount: (arq.salesCount || 0) + 1 };
-        if (this.schemaHasRtAcumulado) payload.rt_acumulado = parseFloat(arq.rt_acumulado || 0) + (valorVenda * (arq.rtPercentual || 0.05));
-        const { error: updateError } = await supabase.from('arquitetos').update(payload).eq('id', idParceiro);
-        if (updateError) alert("Comissão salva, mas erro ao atualizar arquiteto: " + updateError.message);
-        else {
-            alert('Comissão manual adicionada com sucesso!');
-            await this.logAction(`Adicionou comissão manual de ${formatCurrency(valorVenda)} para ${arq.nome} (ID: ${idParceiro})`);
+        if (!arq) {
+            alert(`Arquiteto com ID ${idParceiro} não encontrado.`);
+            return;
         }
-        if (idVenda) {
-            const { error } = await supabase.from('sysled_imports').insert({ id_parceiro: idParceiro, valor_nota: valorVenda, data_finalizacao_prevenda: document.getElementById('manual-data-venda').value, id_pedido: idVenda });
-            if (error) alert("Erro ao registrar na tabela de controle (sysled_imports).");
+
+        const newComissao = {
+            id_parceiro: idParceiro,
+            id_venda: document.getElementById('manual-id-venda').value.trim(),
+            valor_venda: valorVenda,
+            data_venda: document.getElementById('manual-data-venda').value,
+            consultor: document.getElementById('manual-consultor').value,
+            justificativa: document.getElementById('manual-justificativa').value,
+            status: 'pendente'
+        };
+
+        const { error } = await supabase.from('comissoes_manuais').insert(newComissao);
+
+        if (error) {
+            alert("Erro ao salvar solicitação: " + error.message);
+            return;
         }
+
+        alert('Solicitação de comissão manual enviada para aprovação!');
+        await this.logAction(`Enviou comissão manual para aprovação de ${formatCurrency(valorVenda)} para ${arq.nome}`);
         form.reset();
+        await this.loadData();
+        this.renderAll();
+    }
+    
+    async handleAprovarInclusaoManual(e) {
+        const btn = e.target.closest('#aprovar-inclusao-manual-btn');
+        if (!btn) return;
+    
+        const comissaoId = parseInt(btn.dataset.comissaoId, 10);
+        const comissao = this.comissoesManuais.find(c => c.id === comissaoId);
+        if (!comissao) {
+            alert('Erro: Comissão não encontrada.'); return;
+        }
+    
+        if (comissao.status === 'aprovada') {
+            alert('Esta comissão já foi aprovada.'); return;
+        }
+    
+        if (!confirm(`Aprovar a inclusão de ${formatCurrency(comissao.valor_venda)} para o parceiro ${comissao.id_parceiro}?`)) return;
+    
+        const arq = this.arquitetos.find(a => a.id === comissao.id_parceiro);
+        if (!arq) {
+            alert(`Arquiteto com ID ${comissao.id_parceiro} não foi encontrado.`); return;
+        }
+    
+        const valorVenda = comissao.valor_venda;
+        const payload = {
+            valorVendasTotal: (arq.valorVendasTotal || 0) + valorVenda,
+            pontos: (this.pontuacoes[comissao.id_parceiro] || 0) + Math.floor(valorVenda / 1000),
+            salesCount: (arq.salesCount || 0) + 1,
+        };
+        if (this.schemaHasRtAcumulado) {
+            payload.rt_acumulado = parseFloat(arq.rt_acumulado || 0) + (valorVenda * (arq.rtPercentual || 0.05));
+        }
+    
+        const { error: updateError } = await supabase.from('arquitetos').update(payload).eq('id', comissao.id_parceiro);
+        if (updateError) {
+            alert("Erro ao atualizar dados do arquiteto: " + updateError.message); return;
+        }
+    
+        const { error: comissaoError } = await supabase.from('comissoes_manuais').update({ status: 'aprovada' }).eq('id', comissaoId);
+        if (comissaoError) {
+            alert("Dados do arquiteto atualizados, mas falha ao marcar comissão como aprovada: " + comissaoError.message);
+        }
+    
+        if (comissao.id_venda) {
+            const { data: existing } = await supabase.from('sysled_imports').select('id_pedido').eq('id_pedido', comissao.id_venda).maybeSingle();
+            if (!existing) {
+                const { error } = await supabase.from('sysled_imports').insert({ 
+                    id_parceiro: comissao.id_parceiro, 
+                    valor_nota: comissao.valor_venda, 
+                    data_finalizacao_prevenda: comissao.data_venda, 
+                    id_pedido: comissao.id_venda 
+                });
+                if (error) alert("Aviso: Erro ao registrar na tabela de controle de duplicados (sysled_imports).");
+            }
+        }
+        
+        alert('Comissão aprovada e valores contabilizados com sucesso!');
+        await this.logAction(`Aprovou comissão manual de ${formatCurrency(valorVenda)} para ${arq.nome} (ID: ${arq.id})`);
+        
+        this.closeComissaoManualDetailsModal();
         await this.loadData();
         this.renderAll();
     }
@@ -1238,4 +1326,3 @@ class RelacionamentoApp {
 }
 
 export default RelacionamentoApp;
-

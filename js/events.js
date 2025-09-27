@@ -80,6 +80,7 @@ export function initializeEventListeners(app) {
         // Ações da aba Inclusão Manual e Modais relacionados
         if (target.closest('.view-comissao-details-btn')) { e.preventDefault(); app.handleHistoricoManualClick(e); }
         if (target.closest('#close-comissao-manual-details-btn')) app.closeComissaoManualDetailsModal();
+        if (target.closest('#aprovar-inclusao-manual-btn')) app.handleAprovarInclusaoManual(e);
     });
 
     // --- DELEGAÇÃO DE EVENTOS DE SUBMISSÃO (FORMULÁRIOS) ---
