@@ -252,7 +252,14 @@ class RelacionamentoApp {
         }
         const rowsHtml = this.comissoesManuais.map(c => {
             const status = c.status || 'pendente';
-            const statusColor = status === 'aprovada' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+            let statusColor;
+            if (status === 'aprovada') {
+                statusColor = 'bg-green-100 text-green-800';
+            } else if (status === 'Recusada Gestão') {
+                statusColor = 'bg-red-100 text-red-800';
+            } else {
+                statusColor = 'bg-yellow-100 text-yellow-800';
+            }
             return `
             <tr class="border-b text-sm">
                 <td class="p-2">${c.id_parceiro}</td>
@@ -511,6 +518,16 @@ class RelacionamentoApp {
         if (!comissao) { alert('Detalhes da comissão não encontrados.'); return; }
         const arquiteto = this.arquitetos.find(a => a.id === comissao.id_parceiro);
         const status = comissao.status || 'pendente';
+
+        let statusColor;
+        if (status === 'aprovada') {
+            statusColor = 'bg-green-100 text-green-800';
+        } else if (status === 'Recusada Gestão') {
+            statusColor = 'bg-red-100 text-red-800';
+        } else {
+            statusColor = 'bg-yellow-100 text-yellow-800';
+        }
+
         const content = [
             { label: 'ID Parceiro', value: comissao.id_parceiro },
             { label: 'Nome Parceiro', value: arquiteto ? arquiteto.nome : 'Não encontrado' },
@@ -519,7 +536,7 @@ class RelacionamentoApp {
             { label: 'Data Venda', value: formatApiDateToBR(comissao.data_venda) },
             { label: 'Consultor', value: comissao.consultor || 'N/A' },
             { label: 'Justificativa', value: comissao.justificativa, pre: true },
-            { label: 'Status', value: `<span class="px-2 py-1 text-xs font-semibold rounded-full ${status === 'aprovada' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${status}</span>` }
+            { label: 'Status', value: `<span class="px-2 py-1 text-xs font-semibold rounded-full ${statusColor}">${status}</span>` }
         ].map(item => `<div class="grid grid-cols-3 gap-2"><p class="font-semibold text-gray-600 col-span-1">${item.label}:</p><div class="col-span-2 ${item.pre ? 'whitespace-pre-wrap' : ''}">${item.value}</div></div>`).join('');
         document.getElementById('comissao-manual-details-content').innerHTML = content;
         
@@ -1378,4 +1395,3 @@ class RelacionamentoApp {
 }
 
 export default RelacionamentoApp;
-
