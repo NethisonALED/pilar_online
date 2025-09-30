@@ -275,13 +275,28 @@ class RelacionamentoApp {
     }
     
     renderResultados() {
-        const pagamentosPagos = Object.values(this.pagamentos).flat().filter(p => p.pago);
-        const totalRTs = pagamentosPagos.reduce((sum, p) => sum + parseCurrency(p.rt_valor || 0), 0);
+        const todosPagamentos = Object.values(this.pagamentos).flat();
+
+        // Cálculos de RTs Pagas
+        const pagamentosPagos = todosPagamentos.filter(p => p.pago);
+        const totalRTsPagas = pagamentosPagos.reduce((sum, p) => sum + parseCurrency(p.rt_valor || 0), 0);
         const quantidadeRTsPagas = pagamentosPagos.length;
-        const rtMedia = quantidadeRTsPagas > 0 ? totalRTs / quantidadeRTsPagas : 0;
-        document.getElementById('total-rt').textContent = formatCurrency(totalRTs);
+        const rtMedia = quantidadeRTsPagas > 0 ? totalRTsPagas / quantidadeRTsPagas : 0;
+
+        // Cálculos de RTs a Pagar
+        const pagamentosNaoPagos = todosPagamentos.filter(p => !p.pago);
+        const valorEmPagamentosNaoPagos = pagamentosNaoPagos.reduce((sum, p) => sum + parseCurrency(p.rt_valor || 0), 0);
+        const valorAcumuladoNaoGerado = this.arquitetos.reduce((sum, arq) => sum + (parseFloat(arq.rt_acumulado) || 0), 0);
+        const totalRtAPagar = valorEmPagamentosNaoPagos + valorAcumuladoNaoGerado;
+        const quantidadeRTsNaoPagas = pagamentosNaoPagos.length;
+
+
+        // Atualização do DOM
+        document.getElementById('total-rt').textContent = formatCurrency(totalRTsPagas);
         document.getElementById('total-rt-quantidade').textContent = quantidadeRTsPagas;
         document.getElementById('rt-media').textContent = formatCurrency(rtMedia);
+        document.getElementById('total-rt-a-pagar').textContent = formatCurrency(totalRtAPagar);
+        document.getElementById('total-rt-nao-pagas').textContent = quantidadeRTsNaoPagas;
     }
     
     renderSysledTable() {
@@ -1395,3 +1410,4 @@ class RelacionamentoApp {
 }
 
 export default RelacionamentoApp;
+

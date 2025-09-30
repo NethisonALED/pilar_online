@@ -148,24 +148,24 @@
                 
                   <!-- Aba: Arquitetos -->
                   <div id="arquitetos-view" class="tab-view">
-                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Cadastro de Arquitetos</h1>
-                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                         <div class="lg:col-span-1 space-y-6"><div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Adicionar Manualmente</h2><form id="add-arquiteto-form" class="space-y-4"><div><label for="arquiteto-id" class="block text-sm font-medium text-gray-600">ID</label><input type="text" id="arquiteto-id" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></div><div><label for="arquiteto-nome" class="block text-sm font-medium text-gray-600">Nome</label><input type="text" id="arquiteto-nome" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></div><div><label for="arquiteto-email" class="block text-sm font-medium text-gray-600">Email</label><input type="email" id="arquiteto-email" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><div><label for="arquiteto-telefone" class="block text-sm font-medium text-gray-600">Telefone</label><input type="tel" id="arquiteto-telefone" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><div><label for="arquiteto-pix" class="block text-sm font-medium text-gray-600">Chave PIX</label><input type="text" id="arquiteto-pix" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg">Adicionar Arquiteto</button></form></div><div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Importar Planilha</h2><div class="text-center"><label for="arquiteto-file-input" class="file-input-label bg-indigo-600 hover:bg-indigo-700"><i class="fas fa-file-excel mr-2"></i>Escolher Planilha</label><input type="file" id="arquiteto-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="file-input"><p id="file-name-arquitetos" class="text-sm text-gray-500 mt-2"></p></div></div></div>
-                         <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
-                             <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Arquitetos Cadastrados</h2><div class="flex gap-2 items-center"><button id="gerar-pagamentos-rt-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg text-sm"><i class="fas fa-money-check-alt mr-2"></i>Gerar Pagamentos</button><button id="export-csv-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm">Exportar</button><button id="delete-all-arquitetos-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Apagar Todos</button></div></div>
-                             <div class="mb-4"><input type="text" id="arquiteto-search-input" placeholder="Pesquisar por ID ou Nome..." class="w-full p-3 bg-gray-50 border rounded-lg"></div>
-                             <div id="arquitetos-table-container" class="overflow-x-auto"></div>
-                         </div>
-                     </div>
-                 </div>
+                       <h1 class="text-3xl font-bold text-gray-900 mb-6">Cadastro de Arquitetos</h1>
+                       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                           <div class="lg:col-span-1 space-y-6"><div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Adicionar Manualmente</h2><form id="add-arquiteto-form" class="space-y-4"><div><label for="arquiteto-id" class="block text-sm font-medium text-gray-600">ID</label><input type="text" id="arquiteto-id" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></div><div><label for="arquiteto-nome" class="block text-sm font-medium text-gray-600">Nome</label><input type="text" id="arquiteto-nome" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></div><div><label for="arquiteto-email" class="block text-sm font-medium text-gray-600">Email</label><input type="email" id="arquiteto-email" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><div><label for="arquiteto-telefone" class="block text-sm font-medium text-gray-600">Telefone</label><input type="tel" id="arquiteto-telefone" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><div><label for="arquiteto-pix" class="block text-sm font-medium text-gray-600">Chave PIX</label><input type="text" id="arquiteto-pix" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg">Adicionar Arquiteto</button></form></div><div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Importar Planilha</h2><div class="text-center"><label for="arquiteto-file-input" class="file-input-label bg-indigo-600 hover:bg-indigo-700"><i class="fas fa-file-excel mr-2"></i>Escolher Planilha</label><input type="file" id="arquiteto-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="file-input"><p id="file-name-arquitetos" class="text-sm text-gray-500 mt-2"></p></div></div></div>
+                           <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
+                               <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Arquitetos Cadastrados</h2><div class="flex gap-2 items-center"><button id="gerar-pagamentos-rt-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg text-sm"><i class="fas fa-money-check-alt mr-2"></i>Gerar Pagamentos</button><button id="export-csv-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm">Exportar</button><button id="delete-all-arquitetos-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Apagar Todos</button></div></div>
+                               <div class="mb-4"><input type="text" id="arquiteto-search-input" placeholder="Pesquisar por ID ou Nome..." class="w-full p-3 bg-gray-50 border rounded-lg"></div>
+                               <div id="arquitetos-table-container" class="overflow-x-auto"></div>
+                           </div>
+                       </div>
+                  </div>
 
                 <!-- Aba: Pontuação -->
                 <div id="pontuacao-view" class="tab-view">
-                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Pontuação</h1>
-                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                         <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Ranking de Arquitetos</h2><div id="ranking-table-container"></div></div>
-                         <div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Ajuste Manual de Pontos</h2><form id="add-pontos-form" class="space-y-4"><div><label for="arquiteto-select" class="block text-sm font-medium text-gray-600 mb-1">Arquiteto</label><select id="arquiteto-select" class="w-full p-3 bg-gray-50 border rounded-lg" required></select></div><div><label for="pontos-valor" class="block text-sm font-medium text-gray-600 mb-1">Pontos (negativo para remover)</label><input type="number" id="pontos-valor" class="w-full p-3 bg-gray-50 border rounded-lg" required></div><button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg">Adicionar</button></form></div>
-                     </div>
+                       <h1 class="text-3xl font-bold text-gray-900 mb-6">Pontuação</h1>
+                       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                           <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Ranking de Arquitetos</h2><div id="ranking-table-container"></div></div>
+                           <div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Ajuste Manual de Pontos</h2><form id="add-pontos-form" class="space-y-4"><div><label for="arquiteto-select" class="block text-sm font-medium text-gray-600 mb-1">Arquiteto</label><select id="arquiteto-select" class="w-full p-3 bg-gray-50 border rounded-lg" required></select></div><div><label for="pontos-valor" class="block text-sm font-medium text-gray-600 mb-1">Pontos (negativo para remover)</label><input type="number" id="pontos-valor" class="w-full p-3 bg-gray-50 border rounded-lg" required></div><button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg">Adicionar</button></form></div>
+                       </div>
                 </div>
 
                 <!-- Aba: Comprovantes -->
@@ -185,10 +185,32 @@
                 <div id="resultados-view" class="tab-view">
                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Resultados Gerais</h1>
                     <div class="flex justify-end mb-6"><button id="calculate-results-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-sync-alt mr-2"></i>Calcular Resultados</button></div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col"><h2 class="text-sm font-medium text-gray-500">Valor de RTs Pagas</h2><p id="total-rt" class="text-3xl font-bold mt-2 text-emerald-600">R$ 0,00</p></div>
-                        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col"><h2 class="text-sm font-medium text-gray-500">Quantidade de RTs Pagas</h2><p id="total-rt-quantidade" class="text-3xl font-bold mt-2 text-blue-600">0</p></div>
-                        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col"><h2 class="text-sm font-medium text-gray-500">RT Média</h2><p id="rt-media" class="text-3xl font-bold mt-2 text-indigo-600">R$ 0,00</p></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                        <!-- Card 1: Valor Pago -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                            <h2 class="text-sm font-medium text-gray-500">Valor de RTs Pagas</h2>
+                            <p id="total-rt" class="text-3xl font-bold mt-2 text-emerald-600">R$ 0,00</p>
+                        </div>
+                        <!-- Card 2: Quantidade Paga -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                            <h2 class="text-sm font-medium text-gray-500">Quantidade de RTs Pagas</h2>
+                            <p id="total-rt-quantidade" class="text-3xl font-bold mt-2 text-blue-600">0</p>
+                        </div>
+                        <!-- Card 3: Valor a Pagar (NOVO) -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                            <h2 class="text-sm font-medium text-gray-500">Valor de RTs a Pagar</h2>
+                            <p id="total-rt-a-pagar" class="text-3xl font-bold mt-2 text-amber-600">R$ 0,00</p>
+                        </div>
+                        <!-- Card 4: Quantidade Não Paga (NOVO) -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                            <h2 class="text-sm font-medium text-gray-500">Quantidade de RTs Em Aberto</h2>
+                            <p id="total-rt-nao-pagas" class="text-3xl font-bold mt-2 text-rose-600">0</p>
+                        </div>
+                        <!-- Card 5: RT Média -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                            <h2 class="text-sm font-medium text-gray-500">RT Média</h2>
+                            <p id="rt-media" class="text-3xl font-bold mt-2 text-indigo-600">R$ 0,00</p>
+                        </div>
                     </div>
                 </div>
 
