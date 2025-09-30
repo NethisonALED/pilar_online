@@ -647,11 +647,6 @@ class RelacionamentoApp {
         }
         if (processedData.length > 0) {
             await this.processRTData(processedData);
-            if (this.isSysledImport) {
-                const payload = processedData.map(row => ({ id_parceiro: row.id_parceiro, valor_nota: row.valor_venda, data_finalizacao_prevenda: row.data_venda, id_pedido: row.id_prevenda }));
-                const { error } = await supabase.from('sysled_imports').insert(payload);
-                if (error) console.error("Erro ao salvar na tabela sysled_imports:", error);
-            }
         } else {
             alert("Nenhuma venda nova para importar.");
         }
@@ -700,6 +695,21 @@ class RelacionamentoApp {
             if (this.schemaHasRtAcumulado) architectUpdates[partnerId].rt_acumulado += valorVenda * (arquiteto.rtPercentual || 0.05);
         }
         await Promise.all(Object.keys(architectUpdates).map(id => supabase.from('arquitetos').update(architectUpdates[id]).eq('id', id)));
+        
+        if (this.isSysledImport) {
+            const payload = data.map(row => ({
+                id_parceiro: row.id_parceiro,
+                valor_nota: row.valor_venda,
+                data_finalizacao_prevenda: row.data_venda,
+                id_pedido: row.id_prevenda
+            }));
+            const { error } = await supabase.from('sysled_imports').insert(payload);
+            if (error) {
+                alert("AVISO: Os dados dos arquitetos foram atualizados, mas ocorreu um erro ao salvar o histórico de importação para evitar duplicatas. Vendas podem ser importadas novamente no futuro. Erro: " + error.message);
+                console.error("Erro ao salvar na tabela sysled_imports:", error);
+            }
+        }
+        
         alert('Dados de vendas processados com sucesso!');
         await this.loadData();
         this.renderAll();
@@ -1088,6 +1098,7 @@ class RelacionamentoApp {
         const firstRow = this.tempRTData[0];
         if (!firstRow.hasOwnProperty(mapping.id_parceiro) || !firstRow.hasOwnProperty(mapping.valor_venda) || !firstRow.hasOwnProperty(mapping.id_prevenda)) {
             alert("Os dados da Sysled parecem estar incompletos. Colunas essenciais como 'idParceiro', 'valorNota' ou 'idPedido' não foram encontradas. Importação cancelada.");
+            this.isSysledImport = false;
             return;
         }
     
@@ -1095,10 +1106,13 @@ class RelacionamentoApp {
             const newRow = {};
             for (const key in mapping) {
                 if (row.hasOwnProperty(mapping[key])) {
-                    newRow[key] = row[mapping[key]];
+                    if (key === 'valor_venda') {
+                        newRow[key] = parseApiNumber(row[mapping[key]]);
+                    } else {
+                        newRow[key] = row[mapping[key]];
+                    }
                 }
             }
-            newRow.valor_venda = parseApiNumber(newRow.valor_venda);
             return newRow;
         });
     
@@ -1110,6 +1124,7 @@ class RelacionamentoApp {
     
             if (error) {
                 alert('Erro ao verificar vendas existentes: ' + error.message);
+                this.isSysledImport = false;
                 return;
             }
     
@@ -1124,17 +1139,9 @@ class RelacionamentoApp {
     
         if (dataToProcess.length > 0) {
             await this.processRTData(dataToProcess);
-    
-            const payload = dataToProcess.map(row => ({
-                id_parceiro: row.id_parceiro,
-                valor_nota: row.valor_venda,
-                data_finalizacao_prevenda: row.data_venda,
-                id_pedido: row.id_prevenda
-            }));
-            const { error } = await supabase.from('sysled_imports').insert(payload);
-            if (error) console.error("Erro ao salvar na tabela sysled_imports:", error);
         } else {
             alert("Nenhuma venda nova para importar. Todas as vendas filtradas já foram processadas anteriormente.");
+            this.isSysledImport = false;
         }
     }
     
