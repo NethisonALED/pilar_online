@@ -247,31 +247,51 @@ class RelacionamentoApp {
     renderHistoricoManual() {
         const container = document.getElementById('historico-manual-container');
         if (!container) return;
+    
+        let rowsHtml = '';
         if (this.comissoesManuais.length === 0) {
-            container.innerHTML = `<p class="text-center text-gray-500">Nenhuma comissão manual adicionada ainda.</p>`; return;
+            rowsHtml = `<tr><td colspan="7" class="text-center text-gray-500 py-4">Nenhuma comissão manual adicionada ainda.</td></tr>`;
+        } else {
+            rowsHtml = this.comissoesManuais.map(c => {
+                const status = c.status || 'pendente';
+                let statusColor;
+                if (status === 'aprovada') {
+                    statusColor = 'bg-green-100 text-green-800';
+                } else if (status === 'Recusada Gestão') {
+                    statusColor = 'bg-red-100 text-red-800';
+                } else {
+                    statusColor = 'bg-yellow-100 text-yellow-800';
+                }
+                return `
+                <tr class="border-b text-sm hover:bg-gray-50">
+                    <td class="p-2">${c.id_parceiro}</td>
+                    <td class="p-2"><a href="#" class="view-comissao-details-btn text-blue-600 hover:underline" data-comissao-id="${c.id}">${c.id_venda || 'N/A'}</a></td>
+                    <td class="p-2">${formatApiDateToBR(c.data_venda)}</td>
+                    <td class="p-2 text-right">${formatCurrency(c.valor_venda)}</td>
+                    <td class="p-2" title="${c.justificativa}">${(c.justificativa || '').substring(0, 30)}${c.justificativa && c.justificativa.length > 30 ? '...' : ''}</td>
+                    <td class="p-2">${c.consultor || ''}</td>
+                    <td class="p-2 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusColor}">${status}</span></td>
+                </tr>`;
+            }).join('');
         }
-        const rowsHtml = this.comissoesManuais.map(c => {
-            const status = c.status || 'pendente';
-            let statusColor;
-            if (status === 'aprovada') {
-                statusColor = 'bg-green-100 text-green-800';
-            } else if (status === 'Recusada Gestão') {
-                statusColor = 'bg-red-100 text-red-800';
-            } else {
-                statusColor = 'bg-yellow-100 text-yellow-800';
-            }
-            return `
-            <tr class="border-b text-sm">
-                <td class="p-2">${c.id_parceiro}</td>
-                <td class="p-2"><a href="#" class="view-comissao-details-btn text-blue-600 hover:underline" data-comissao-id="${c.id}">${c.id_venda || 'N/A'}</a></td>
-                <td class="p-2">${formatApiDateToBR(c.data_venda)}</td>
-                <td class="p-2 text-right">${formatCurrency(c.valor_venda)}</td>
-                <td class="p-2" title="${c.justificativa}">${c.justificativa.substring(0, 30)}${c.justificativa.length > 30 ? '...' : ''}</td>
-                <td class="p-2">${c.consultor || ''}</td>
-                <td class="p-2 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusColor}">${status}</span></td>
-            </tr>`
-        }).join('');
-        container.innerHTML = `<table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">ID Venda</th><th class="p-2 text-left">Data</th><th class="p-2 text-right">Valor</th><th class="p-2 text-left">Justificativa</th><th class="p-2 text-left">Consultor</th><th class="p-2 text-center">Status</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+    
+        container.innerHTML = `
+            <div class="max-h-[65vh] overflow-y-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-100 text-xs uppercase">
+                            <th class="p-2 text-left">ID Parceiro</th>
+                            <th class="p-2 text-left">ID Venda</th>
+                            <th class="p-2 text-left">Data</th>
+                            <th class="p-2 text-right">Valor</th>
+                            <th class="p-2 text-left">Justificativa</th>
+                            <th class="p-2 text-left">Consultor</th>
+                            <th class="p-2 text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
+            </div>`;
     }
     
     renderResultados() {
@@ -1417,4 +1437,3 @@ class RelacionamentoApp {
 }
 
 export default RelacionamentoApp;
-
