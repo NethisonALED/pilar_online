@@ -77,9 +77,9 @@
                         <a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="resultados">
                             <i class="fas fa-chart-pie fa-fw"></i><span>Resultados</span>
                         </a>
-                        <!--<a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="eventos">
+                        <a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="eventos">
                             <i class="fas fa-history fa-fw"></i><span>Eventos</span>
-                        </a>-->
+                        </a>
                     </div>
                 </nav>
                 <div class="sidebar-footer mt-auto px-2">
@@ -148,24 +148,24 @@
                 
                   <!-- Aba: Arquitetos -->
                   <div id="arquitetos-view" class="tab-view">
-                       <h1 class="text-3xl font-bold text-gray-900 mb-6">Cadastro de Arquitetos</h1>
-                       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                           <div class="lg:col-span-1 space-y-6"><div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Adicionar Manualmente</h2><form id="add-arquiteto-form" class="space-y-4"><div><label for="arquiteto-id" class="block text-sm font-medium text-gray-600">ID</label><input type="text" id="arquiteto-id" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></div><div><label for="arquiteto-nome" class="block text-sm font-medium text-gray-600">Nome</label><input type="text" id="arquiteto-nome" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></div><div><label for="arquiteto-email" class="block text-sm font-medium text-gray-600">Email</label><input type="email" id="arquiteto-email" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><div><label for="arquiteto-telefone" class="block text-sm font-medium text-gray-600">Telefone</label><input type="tel" id="arquiteto-telefone" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><div><label for="arquiteto-pix" class="block text-sm font-medium text-gray-600">Chave PIX</label><input type="text" id="arquiteto-pix" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg">Adicionar Arquiteto</button></form></div><div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Importar Planilha</h2><div class="text-center"><label for="arquiteto-file-input" class="file-input-label bg-indigo-600 hover:bg-indigo-700"><i class="fas fa-file-excel mr-2"></i>Escolher Planilha</label><input type="file" id="arquiteto-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="file-input"><p id="file-name-arquitetos" class="text-sm text-gray-500 mt-2"></p></div></div></div>
-                           <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
-                               <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Arquitetos Cadastrados</h2><div class="flex gap-2 items-center"><button id="gerar-pagamentos-rt-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg text-sm"><i class="fas fa-money-check-alt mr-2"></i>Gerar Pagamentos</button><button id="export-csv-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm">Exportar</button><button id="delete-all-arquitetos-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Apagar Todos</button></div></div>
-                               <div class="mb-4"><input type="text" id="arquiteto-search-input" placeholder="Pesquisar por ID ou Nome..." class="w-full p-3 bg-gray-50 border rounded-lg"></div>
-                               <div id="arquitetos-table-container" class="overflow-x-auto"></div>
-                           </div>
-                       </div>
-                  </div>
+                         <h1 class="text-3xl font-bold text-gray-900 mb-6">Cadastro de Arquitetos</h1>
+                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                             <div class="lg:col-span-1 space-y-6"><div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Adicionar Manualmente</h2><form id="add-arquiteto-form" class="space-y-4"><div><label for="arquiteto-id" class="block text-sm font-medium text-gray-600">ID</label><input type="text" id="arquiteto-id" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></div><div><label for="arquiteto-nome" class="block text-sm font-medium text-gray-600">Nome</label><input type="text" id="arquiteto-nome" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></div><div><label for="arquiteto-email" class="block text-sm font-medium text-gray-600">Email</label><input type="email" id="arquiteto-email" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><div><label for="arquiteto-telefone" class="block text-sm font-medium text-gray-600">Telefone</label><input type="tel" id="arquiteto-telefone" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><div><label for="arquiteto-pix" class="block text-sm font-medium text-gray-600">Chave PIX</label><input type="text" id="arquiteto-pix" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg">Adicionar Arquiteto</button></form></div><div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Importar Planilha</h2><div class="text-center"><label for="arquiteto-file-input" class="file-input-label bg-indigo-600 hover:bg-indigo-700"><i class="fas fa-file-excel mr-2"></i>Escolher Planilha</label><input type="file" id="arquiteto-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="file-input"><p id="file-name-arquitetos" class="text-sm text-gray-500 mt-2"></p></div></div></div>
+                             <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
+                                 <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Arquitetos Cadastrados</h2><div class="flex gap-2 items-center"><button id="gerar-pagamentos-rt-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg text-sm"><i class="fas fa-money-check-alt mr-2"></i>Gerar Pagamentos</button><button id="export-csv-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm">Exportar</button><button id="delete-all-arquitetos-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Apagar Todos</button></div></div>
+                                 <div class="mb-4"><input type="text" id="arquiteto-search-input" placeholder="Pesquisar por ID ou Nome..." class="w-full p-3 bg-gray-50 border rounded-lg"></div>
+                                 <div id="arquitetos-table-container" class="overflow-x-auto"></div>
+                             </div>
+                         </div>
+                    </div>
 
                 <!-- Aba: Pontuação -->
                 <div id="pontuacao-view" class="tab-view">
-                       <h1 class="text-3xl font-bold text-gray-900 mb-6">Pontuação</h1>
-                       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                           <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Ranking de Arquitetos</h2><div id="ranking-table-container"></div></div>
-                           <div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Ajuste Manual de Pontos</h2><form id="add-pontos-form" class="space-y-4"><div><label for="arquiteto-select" class="block text-sm font-medium text-gray-600 mb-1">Arquiteto</label><select id="arquiteto-select" class="w-full p-3 bg-gray-50 border rounded-lg" required></select></div><div><label for="pontos-valor" class="block text-sm font-medium text-gray-600 mb-1">Pontos (negativo para remover)</label><input type="number" id="pontos-valor" class="w-full p-3 bg-gray-50 border rounded-lg" required></div><button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg">Adicionar</button></form></div>
-                       </div>
+                         <h1 class="text-3xl font-bold text-gray-900 mb-6">Pontuação</h1>
+                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                             <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Ranking de Arquitetos</h2><div id="ranking-table-container"></div></div>
+                             <div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Ajuste Manual de Pontos</h2><form id="add-pontos-form" class="space-y-4"><div><label for="arquiteto-select" class="block text-sm font-medium text-gray-600 mb-1">Arquiteto</label><select id="arquiteto-select" class="w-full p-3 bg-gray-50 border rounded-lg" required></select></div><div><label for="pontos-valor" class="block text-sm font-medium text-gray-600 mb-1">Pontos (negativo para remover)</label><input type="number" id="pontos-valor" class="w-full p-3 bg-gray-50 border rounded-lg" required></div><button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg">Adicionar</button></form></div>
+                         </div>
                 </div>
 
                 <!-- Aba: Comprovantes -->
@@ -213,21 +213,22 @@
                         </div>
                     </div>
                 </div>
-
-              <!--NOVO: Aba de Eventos  
+                
+                <!-- Aba de Eventos -->
                 <div id="eventos-view" class="tab-view">
                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Log de Eventos</h1>
                     <div class="bg-white rounded-2xl shadow-lg p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-xl font-semibold">Registros de Atividade</h2>
+                             <button id="clear-events-log-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Limpar Logs</button>
                         </div>
                         <div id="eventos-log-container" class="max-h-[70vh] overflow-y-auto">
-                            A tabela de logs será renderizada aqui pelo JavaScript 
+                            <!-- A tabela de logs será renderizada aqui pelo JavaScript -->
                         </div>
                     </div>
                 </div>
             </main>
-        </div> -->
+        </div>
         
         <!-- Modais Globais -->
         <div id="rt-mapping-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">

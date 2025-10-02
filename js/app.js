@@ -721,7 +721,8 @@ class RelacionamentoApp {
                 id_parceiro: row.id_parceiro,
                 valor_nota: row.valor_venda,
                 data_finalizacao_prevenda: row.data_venda,
-                id_pedido: row.id_prevenda
+                id_pedido: row.id_prevenda,
+                consultor: row.executivo // Adicionado o campo consultor
             }));
             const { error } = await supabase.from('sysled_imports').insert(payload);
             if (error) {
@@ -1402,7 +1403,8 @@ class RelacionamentoApp {
                 id_parceiro: comissao.id_parceiro, 
                 valor_nota: comissao.valor_venda, 
                 data_finalizacao_prevenda: comissao.data_venda, 
-                id_pedido: comissao.id_venda 
+                id_pedido: comissao.id_venda,
+                consultor: comissao.consultor // Adicionado o campo consultor
             });
             if (error) alert("Aviso: Erro ao registrar na tabela de controle de duplicados (sysled_imports).");
         }
