@@ -183,6 +183,7 @@ class RelacionamentoApp {
         container.innerHTML = `<div class="max-h-[65vh] overflow-y-auto"><table class="w-full"><thead>${headerRow}</thead><tbody>${rows}</tbody></table></div>`;
     }
 
+    // MODIFICADO: Adicionada a coluna Consultor
     renderPagamentos(filter = '') {
         const container = document.getElementById('pagamentos-container');
         if (!container) return;
@@ -200,14 +201,16 @@ class RelacionamentoApp {
                 const rowsHtml = pagamentosDoDia.map(p => {
                     const hasComprovante = p.comprovante && p.comprovante.url;
                     return `<tr class="border-b text-sm">
-                                <td class="p-2">${p.id_parceiro}</td><td class="p-2">${p.parceiro}</td>
+                                <td class="p-2">${p.id_parceiro}</td>
+                                <td class="p-2">${p.parceiro}</td>
+                                <td class="p-2">${p.consultor || 'N/A'}</td>
                                 <td class="p-2 text-right font-semibold">${formatCurrency(p.rt_valor)}<button class="edit-rt-btn text-blue-500 hover:text-blue-700 ml-2" title="Editar Valor RT" data-date="${date}" data-id="${p.id}"><i class="fas fa-edit fa-xs"></i></button></td>
                                 <td class="p-2 text-center"><input type="checkbox" class="pagamento-status h-5 w-5" data-date="${date}" data-id="${p.id}" ${p.pago ? 'checked' : ''}></td>
                                 <td class="p-2"><div class="flex items-center gap-2"><label for="comprovante-input-${p.id}" class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs py-1 px-3 rounded-md whitespace-nowrap">Anexar</label><input type="file" id="comprovante-input-${p.id}" class="comprovante-input file-input" data-date="${date}" data-id="${p.id}"><span class="file-status-text text-xs ${hasComprovante ? 'text-green-600 font-semibold' : 'text-gray-500'}">${hasComprovante ? 'Comprovante anexado' : 'Nenhum arquivo'}</span></div></td>
                                 <td class="p-2 text-center"><button class="view-comprovante-btn text-blue-600 hover:underline" data-date="${date}" data-id="${p.id}" ${!hasComprovante ? 'disabled' : ''} style="${!hasComprovante ? 'opacity: 0.5; cursor: not-allowed;' : ''}">Ver</button></td>
                             </tr>`;
                 }).join('');
-                container.innerHTML += `<div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Pagamentos Gerados em ${date}</h2><div class="flex items-center gap-2"><button class="gerar-relatorio-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Gerar Relatório</button><button class="download-xlsx-btn bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Baixar XLSX</button><button class="delete-pagamentos-btn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Excluir Lote</button></div></div><div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">Parceiro</th><th class="p-2 text-right">Valor RT</th><th class="p-2 text-center">Pago</th><th class="p-2 text-left">Anexar Comprovante</th><th class="p-2 text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`;
+                container.innerHTML += `<div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Pagamentos Gerados em ${date}</h2><div class="flex items-center gap-2"><button class="gerar-relatorio-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Gerar Relatório</button><button class="download-xlsx-btn bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Baixar XLSX</button><button class="delete-pagamentos-btn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Excluir Lote</button></div></div><div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">Parceiro</th><th class="p-2 text-left">Consultor</th><th class="p-2 text-right">Valor RT</th><th class="p-2 text-center">Pago</th><th class="p-2 text-left">Anexar Comprovante</th><th class="p-2 text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`;
             }
         });
         if (!hasResults && filter) container.innerHTML = `<p class="text-center text-gray-500">Nenhum pagamento encontrado para o ID informado.</p>`;
@@ -999,10 +1002,18 @@ class RelacionamentoApp {
         }
     }
 
+    // MODIFICADO: Adicionada a coluna Consultor
     exportPagamentosXLSX(date) {
         const data = this.pagamentos[date];
         if (!data || data.length === 0) { alert("Sem dados para exportar."); return; }
-        const reportData = data.map(p => ({ 'ID Parceiro': p.id_parceiro, 'Parceiro': p.parceiro, 'Valor RT': parseCurrency(p.rt_valor), 'Pago': p.pago ? 'Sim' : 'Não', 'Data Geração': p.data_geracao }));
+        const reportData = data.map(p => ({
+            'ID Parceiro': p.id_parceiro,
+            'Parceiro': p.parceiro,
+            'Consultor': p.consultor || '',
+            'Valor RT': parseCurrency(p.rt_valor),
+            'Pago': p.pago ? 'Sim' : 'Não',
+            'Data Geração': p.data_geracao
+        }));
         const ws = XLSX.utils.json_to_sheet(reportData);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Pagamentos");
@@ -1010,13 +1021,32 @@ class RelacionamentoApp {
         this.logAction(`Exportou o relatório de pagamentos de ${date}.`);
     }
 
+    // MODIFICADO: Adicionada a coluna Consultor
     generatePagamentoPrint(date) {
         const data = this.pagamentos[date];
         if (!data || data.length === 0) { alert('Sem dados para gerar relatório.'); return; }
         const total = data.reduce((sum, p) => sum + parseCurrency(p.rt_valor || 0), 0);
         const rows = data.sort((a, b) => a.parceiro.localeCompare(b.parceiro)).map(p => `
-            <tr class="border-b text-sm"><td class="p-2">${p.id_parceiro}</td><td class="p-2">${p.parceiro}</td><td class="p-2 text-right">${formatCurrency(p.rt_valor)}</td></tr>`).join('');
-        const content = `<div class="report-section"><h2 class="text-xl font-bold mb-4">Relatório de Pagamento - ${date}</h2><table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID</th><th class="p-2 text-left">Parceiro</th><th class="p-2 text-right">Valor RT</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+            <tr class="border-b text-sm">
+                <td class="p-2">${p.id_parceiro}</td>
+                <td class="p-2">${p.parceiro}</td>
+                <td class="p-2">${p.consultor || ''}</td>
+                <td class="p-2 text-right">${formatCurrency(p.rt_valor)}</td>
+            </tr>`).join('');
+        const content = `<div class="report-section">
+          <h2 class="text-xl font-bold mb-4">Relatório de Pagamento - ${date}</h2>
+          <table class="w-full">
+            <thead>
+              <tr class="bg-gray-100 text-xs uppercase">
+                <th class="p-2 text-left">ID</th>
+                <th class="p-2 text-left">Parceiro</th>
+                <th class="p-2 text-left">Consultor</th>
+                <th class="p-2 text-right">Valor RT</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
         const template = `<html><head><title>Relatório - ${date}</title><script src="https://cdn.tailwindcss.com"><\/script><style>@media print{.no-print{display: none;}}</style></head><body class="p-8 bg-gray-100"><div class="no-print text-center mb-8"><button onclick="window.print()" class="bg-blue-600 text-white py-2 px-6 rounded">Imprimir</button></div><div class="max-w-5xl mx-auto bg-white p-8 rounded shadow">${content}<div class="mt-8 text-right"><h3 class="text-xl font-bold">Soma Total (RT) a Pagar</h3><p class="text-3xl font-bold mt-1 text-emerald-600">${formatCurrency(total)}</p></div></div></body></html>`;
         const win = window.open('', '_blank');
         win.document.write(template);
@@ -1033,14 +1063,56 @@ class RelacionamentoApp {
         this.openGerarPagamentosModal();
     }
 
+    // MODIFICADO: Busca o último consultor antes de gerar os comprovantes
     async confirmarGeracaoComprovantes() {
         if (this.eligibleForPayment.length === 0) return;
+
+        // NOVO: Bloco para buscar o último consultor de cada parceiro elegível
+        const partnerIds = this.eligibleForPayment.map(a => a.id);
+        const { data: consultantData, error: consultantError } = await supabase
+            .from('sysled_imports')
+            .select('id_parceiro, consultor, data_finalizacao_prevenda')
+            .in('id_parceiro', partnerIds)
+            .order('data_finalizacao_prevenda', { ascending: false });
+
+        if (consultantError) {
+            alert("Erro ao buscar dados do consultor: " + consultantError.message);
+            return;
+        }
+
+        const consultantMap = {};
+        if (consultantData) {
+            for (const record of consultantData) {
+                // Como está ordenado por data descendente, o primeiro que encontramos para cada parceiro é o mais recente
+                if (!consultantMap[record.id_parceiro]) {
+                    consultantMap[record.id_parceiro] = record.consultor;
+                }
+            }
+        }
+        // FIM DO NOVO BLOCO
+
         const todayDB = new Date().toISOString().slice(0, 10);
-        const pagamentos = this.eligibleForPayment.map(a => ({ id_parceiro: a.id, parceiro: a.nome, rt_valor: a.rt_acumulado, pago: false, data_geracao: todayDB }));
+        // MODIFICADO: Adiciona o `consultor` ao objeto de pagamento
+        const pagamentos = this.eligibleForPayment.map(a => ({
+            id_parceiro: a.id,
+            parceiro: a.nome,
+            rt_valor: a.rt_acumulado,
+            pago: false,
+            data_geracao: todayDB,
+            consultor: consultantMap[a.id] || null // Busca o consultor no mapa
+        }));
+
         const { error: insertError } = await supabase.from('pagamentos').insert(pagamentos);
         if (insertError) { alert("Erro ao gerar comprovantes: " + insertError.message); return; }
-        const updates = this.eligibleForPayment.map(a => supabase.from('arquitetos').update({ rt_acumulado: 0, rt_total_pago: (parseFloat(a.rt_total_pago) || 0) + (parseFloat(a.rt_acumulado) || 0) }).eq('id', a.id));
+
+        const updates = this.eligibleForPayment.map(a =>
+            supabase.from('arquitetos').update({
+                rt_acumulado: 0,
+                rt_total_pago: (parseFloat(a.rt_total_pago) || 0) + (parseFloat(a.rt_acumulado) || 0)
+            }).eq('id', a.id)
+        );
         await Promise.all(updates);
+
         alert(`${this.eligibleForPayment.length} comprovantes gerados!`);
         await this.logAction(`Gerou ${this.eligibleForPayment.length} pagamentos em lote.`);
         document.getElementById('gerar-pagamentos-modal').classList.remove('flex');
@@ -1050,6 +1122,7 @@ class RelacionamentoApp {
         document.querySelector('.menu-link[data-tab="comprovantes"]').click();
     }
 
+    // MODIFICADO: Busca o último consultor antes de gerar o pagamento individual
     async handleGerarPagamentoFicha() {
         const id = document.getElementById('edit-arquiteto-original-id').value;
         const arq = this.arquitetos.find(a => a.id === id);
@@ -1057,9 +1130,34 @@ class RelacionamentoApp {
         const valor = parseFloat(arq.rt_acumulado || 0);
         if (valor <= 0) { alert('Arquiteto sem saldo de RT acumulado.'); return; }
         if (confirm(`Gerar pagamento de ${formatCurrency(valor)} para ${arq.nome}? O saldo será zerado.`)) {
+            // NOVO: Busca o último consultor para este parceiro específico
+            const { data: latestImport, error: consultantError } = await supabase
+                .from('sysled_imports')
+                .select('consultor')
+                .eq('id_parceiro', arq.id)
+                .order('data_finalizacao_prevenda', { ascending: false })
+                .limit(1)
+                .single();
+            
+            if (consultantError) {
+                console.error("Aviso: Não foi possível encontrar o consultor. O pagamento será gerado sem essa informação.", consultantError);
+            }
+            const consultantName = latestImport ? latestImport.consultor : null;
+            // FIM DO NOVO BLOCO
+
             const todayDB = new Date().toISOString().slice(0, 10);
-            const { error: insertError } = await supabase.from('pagamentos').insert([{ id_parceiro: arq.id, parceiro: arq.nome, rt_valor: valor, pago: false, data_geracao: todayDB }]);
+            // MODIFICADO: Adiciona o `consultor` ao objeto de pagamento
+            const { error: insertError } = await supabase.from('pagamentos').insert([{
+                id_parceiro: arq.id,
+                parceiro: arq.nome,
+                rt_valor: valor,
+                pago: false,
+                data_geracao: todayDB,
+                consultor: consultantName
+            }]);
+
             if (insertError) { alert("Erro ao gerar comprovante: " + insertError.message); return; }
+
             const { error: updateError } = await supabase.from('arquitetos').update({ rt_acumulado: 0, rt_total_pago: (parseFloat(arq.rt_total_pago) || 0) + valor }).eq('id', arq.id);
             if (updateError) alert("Comprovante gerado, mas erro ao atualizar saldo: " + updateError.message);
             else {
@@ -1439,3 +1537,4 @@ class RelacionamentoApp {
 }
 
 export default RelacionamentoApp;
+
