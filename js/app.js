@@ -1021,18 +1021,23 @@ class RelacionamentoApp {
         this.logAction(`Exportou o relatório de pagamentos de ${date}.`);
     }
 
-    // MODIFICADO: Adicionada a coluna Consultor
+    // MODIFICADO: Adicionada a coluna Chave Pix
     generatePagamentoPrint(date) {
         const data = this.pagamentos[date];
         if (!data || data.length === 0) { alert('Sem dados para gerar relatório.'); return; }
         const total = data.reduce((sum, p) => sum + parseCurrency(p.rt_valor || 0), 0);
-        const rows = data.sort((a, b) => a.parceiro.localeCompare(b.parceiro)).map(p => `
+        const rows = data.sort((a, b) => a.parceiro.localeCompare(b.parceiro)).map(p => {
+            const arquiteto = this.arquitetos.find(arq => arq.id === p.id_parceiro);
+            const chavePix = arquiteto ? arquiteto.pix || 'Não cadastrada' : 'Não encontrado';
+            return `
             <tr class="border-b text-sm">
                 <td class="p-2">${p.id_parceiro}</td>
                 <td class="p-2">${p.parceiro}</td>
+                <td class="p-2">${chavePix}</td>
                 <td class="p-2">${p.consultor || ''}</td>
                 <td class="p-2 text-right">${formatCurrency(p.rt_valor)}</td>
-            </tr>`).join('');
+            </tr>`;
+        }).join('');
         const content = `<div class="report-section">
           <h2 class="text-xl font-bold mb-4">Relatório de Pagamento - ${date}</h2>
           <table class="w-full">
@@ -1040,6 +1045,7 @@ class RelacionamentoApp {
               <tr class="bg-gray-100 text-xs uppercase">
                 <th class="p-2 text-left">ID</th>
                 <th class="p-2 text-left">Parceiro</th>
+                <th class="p-2 text-left">Chave Pix</th>
                 <th class="p-2 text-left">Consultor</th>
                 <th class="p-2 text-right">Valor RT</th>
               </tr>
@@ -1537,4 +1543,3 @@ class RelacionamentoApp {
 }
 
 export default RelacionamentoApp;
-
