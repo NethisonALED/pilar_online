@@ -452,11 +452,16 @@ class RelacionamentoApp {
                 if (select && headers.includes(autoMap[key])) select.value = autoMap[key];
             }
         }
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeRtMappingModal();
+        };
         modal.classList.add('flex');
     }
 
     closeRtMappingModal() {
-        document.getElementById('rt-mapping-modal').classList.remove('flex');
+        const modal = document.getElementById('rt-mapping-modal');
+        modal.classList.remove('flex');
+        modal.onclick = null;
         const fileInput = document.getElementById('rt-file-input');
         if (fileInput) fileInput.value = '';
         const fileName = document.getElementById('rt-file-name');
@@ -465,17 +470,23 @@ class RelacionamentoApp {
 
     openArquitetoMappingModal(headers) {
         const form = document.getElementById('arquiteto-mapping-form');
+        const modal = document.getElementById('arquiteto-mapping-modal');
         form.innerHTML = '';
         const fields = { id: 'ID', nome: 'Nome', email: 'Email', telefone: 'Telefone', chave_pix: 'Chave PIX' };
         for (const key in fields) {
             const options = headers.map(h => `<option value="${h}">${h}</option>`).join('');
             form.innerHTML += `<div class="grid grid-cols-2 gap-4 items-center"><label class="font-medium text-gray-700">${fields[key]}</label><select name="${key}" class="w-full p-2 bg-gray-50 border rounded-lg"><option value="">Selecione...</option>${options}</select></div>`;
         }
-        document.getElementById('arquiteto-mapping-modal').classList.add('flex');
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeArquitetoMappingModal();
+        };
+        modal.classList.add('flex');
     }
 
     closeArquitetoMappingModal() {
-        document.getElementById('arquiteto-mapping-modal').classList.remove('flex');
+        const modal = document.getElementById('arquiteto-mapping-modal');
+        modal.classList.remove('flex');
+        modal.onclick = null;
         const fileInput = document.getElementById('arquiteto-file-input');
         if (fileInput) fileInput.value = '';
         const fileName = document.getElementById('file-name-arquitetos');
@@ -496,22 +507,36 @@ class RelacionamentoApp {
         document.getElementById('rt-percentual').value = arquiteto.rtPercentual || 0.05;
         if(this.schemaHasRtAcumulado) document.getElementById('edit-arquiteto-rt-acumulado').textContent = formatCurrency(arquiteto.rt_acumulado || 0);
         if(this.schemaHasRtTotalPago) document.getElementById('edit-arquiteto-rt-total-pago').textContent = formatCurrency(arquiteto.rt_total_pago || 0);
-        document.getElementById('edit-arquiteto-modal').classList.add('flex');
+        const modal = document.getElementById('edit-arquiteto-modal');
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeEditModal();
+        };
+        modal.classList.add('flex');
         this.calculateRT();
     }
 
-    closeEditModal() { document.getElementById('edit-arquiteto-modal').classList.remove('flex'); }
+    closeEditModal() {
+        const modal = document.getElementById('edit-arquiteto-modal');
+        modal.classList.remove('flex');
+        modal.onclick = null;
+    }
     
     openAddValueModal(id) {
         const arquiteto = this.arquitetos.find(a => a.id === id);
         if (!arquiteto) return;
         document.getElementById('add-value-modal-title').textContent = `Adicionar Venda Manual para ${arquiteto.nome}`;
         document.getElementById('add-value-arquiteto-id').value = id;
-        document.getElementById('add-value-modal').classList.add('flex');
+        const modal = document.getElementById('add-value-modal');
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeAddValueModal();
+        };
+        modal.classList.add('flex');
     }
 
     closeAddValueModal() {
-        document.getElementById('add-value-modal').classList.remove('flex');
+        const modal = document.getElementById('add-value-modal');
+        modal.classList.remove('flex');
+        modal.onclick = null;
         document.getElementById('add-value-form').reset();
     }
     
@@ -524,17 +549,35 @@ class RelacionamentoApp {
         imgContainer.innerHTML = (pagamento.comprovante && pagamento.comprovante.url)
             ? `<img src="${pagamento.comprovante.url}" alt="${pagamento.comprovante.name}" class="max-w-full max-h-96 object-contain">`
             : `<p class="text-gray-500">Nenhum comprovante anexado.</p>`;
-        document.getElementById('comprovante-modal').classList.add('flex');
+        const modal = document.getElementById('comprovante-modal');
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeComprovanteModal();
+        };
+        modal.classList.add('flex');
     }
     
-    closeComprovanteModal() { document.getElementById('comprovante-modal').classList.remove('flex'); }
+    closeComprovanteModal() {
+        const modal = document.getElementById('comprovante-modal');
+        modal.classList.remove('flex');
+        modal.onclick = null;
+    }
 
     openGerarPagamentosModal() {
         const container = document.getElementById('gerar-pagamentos-table-container');
         const rowsHtml = this.eligibleForPayment.map(a => `
             <tr class="border-b text-sm"><td class="p-2">${a.id}</td><td class="p-2">${a.nome}</td><td class="p-2 text-right font-semibold text-green-600">${formatCurrency(a.rt_acumulado || 0)}</td><td class="p-2">${a.pix || 'Não cadastrado'}</td></tr>`).join('');
         container.innerHTML = `<table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID</th><th class="p-2 text-left">Nome</th><th class="p-2 text-right">Valor a Pagar</th><th class="p-2 text-left">Chave PIX</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
-        document.getElementById('gerar-pagamentos-modal').classList.add('flex');
+        const modal = document.getElementById('gerar-pagamentos-modal');
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeGerarPagamentosModal();
+        };
+        modal.classList.add('flex');
+    }
+
+    closeGerarPagamentosModal() {
+        const modal = document.getElementById('gerar-pagamentos-modal');
+        modal.classList.remove('flex');
+        modal.onclick = null;
     }
 
     openSaleDetailsModal(pedidoId) {
@@ -545,11 +588,23 @@ class RelacionamentoApp {
         document.getElementById('import-single-sale-btn').dataset.pedidoId = pedidoId;
         const detailsHtml = Object.entries(saleData).map(([key, value]) => `<tr class="border-b"><td class="p-2 font-semibold text-gray-600 align-top">${key}</td><td class="p-2 text-gray-800">${value ?? ''}</td></tr>`).join('');
         document.getElementById('sale-details-content').innerHTML = `<table class="w-full text-sm"><tbody>${detailsHtml}</tbody></table>`;
-        document.getElementById('sale-details-modal').classList.add('flex');
+        const modal = document.getElementById('sale-details-modal');
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeSaleDetailsModal();
+        };
+        modal.classList.add('flex');
     }
 
-    closeSaleDetailsModal() { document.getElementById('sale-details-modal').classList.remove('flex'); }
-    closeSalesHistoryModal() { document.getElementById('sales-history-modal').classList.remove('flex'); }
+    closeSaleDetailsModal() {
+        const modal = document.getElementById('sale-details-modal');
+        modal.classList.remove('flex');
+        modal.onclick = null;
+    }
+    closeSalesHistoryModal() {
+        const modal = document.getElementById('sales-history-modal');
+        modal.classList.remove('flex');
+        modal.onclick = null;
+    }
 
     openComissaoManualDetailsModal(comissaoId) {
         const comissao = this.comissoesManuais.find(c => c.id === comissaoId);
@@ -582,10 +637,18 @@ class RelacionamentoApp {
         approveBtn.dataset.comissaoId = comissaoId;
         approveBtn.style.display = status === 'aprovada' ? 'none' : 'inline-block';
 
-        document.getElementById('comissao-manual-details-modal').classList.add('flex');
+        const modal = document.getElementById('comissao-manual-details-modal');
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeComissaoManualDetailsModal();
+        };
+        modal.classList.add('flex');
     }
 
-    closeComissaoManualDetailsModal() { document.getElementById('comissao-manual-details-modal').classList.remove('flex'); }
+    closeComissaoManualDetailsModal() {
+        const modal = document.getElementById('comissao-manual-details-modal');
+        modal.classList.remove('flex');
+        modal.onclick = null;
+    }
 
     openEditRtModal(date, pagamentoId) {
         const pagamento = this.pagamentos[date]?.find(p => p.id.toString() === pagamentoId);
@@ -593,11 +656,17 @@ class RelacionamentoApp {
         document.getElementById('edit-rt-pagamento-id').value = pagamento.id;
         document.getElementById('edit-rt-pagamento-date').value = date;
         document.getElementById('edit-rt-input').value = parseCurrency(pagamento.rt_valor);
-        document.getElementById('edit-rt-modal').classList.add('flex');
+        const modal = document.getElementById('edit-rt-modal');
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeEditRtModal();
+        };
+        modal.classList.add('flex');
     }
 
     closeEditRtModal() {
-        document.getElementById('edit-rt-modal').classList.remove('flex');
+        const modal = document.getElementById('edit-rt-modal');
+        modal.classList.remove('flex');
+        modal.onclick = null;
         document.getElementById('edit-rt-form').reset();
     }
     
@@ -775,22 +844,92 @@ class RelacionamentoApp {
     async handleArquitetoMapping() {
         const mapping = {};
         document.getElementById('arquiteto-mapping-form').querySelectorAll('select').forEach(s => { mapping[s.name] = s.value; });
-        const novosArquitetos = this.tempArquitetoData.filter(row => {
-            const id = row[mapping.id];
-            return id && !this.arquitetos.some(a => a.id === id.toString());
-        }).map(row => ({ id: String(row[mapping.id]), nome: row[mapping.nome] || '', email: row[mapping.email] || '', telefone: row[mapping.telefone] || '', pix: row[mapping.chave_pix] || '', salesCount: 0, valorVendasTotal: 0, pontos: 0, rtPercentual: 0.05, rt_acumulado: 0, rt_total_pago: 0 }));
-        if (novosArquitetos.length > 0) {
-            const { error } = await supabase.from('arquitetos').insert(novosArquitetos);
-            if (error) { alert("Erro ao importar: " + error.message); }
-            else {
-                alert(`${novosArquitetos.length} novos arquitetos importados.`);
-                await this.logAction(`Importou ${novosArquitetos.length} novos arquitetos via planilha.`);
-                await this.loadData();
-                this.renderAll();
-            }
-        } else {
-            alert('Nenhum arquiteto novo para importar.');
+
+        if (!mapping.id || !mapping.nome) {
+            alert("Os campos 'ID' e 'Nome' são obrigatórios no mapeamento.");
+            return;
         }
+
+        const novosArquitetos = [];
+        const arquitetosParaAtualizar = [];
+
+        this.tempArquitetoData.forEach(row => {
+            const id = String(row[mapping.id] || '');
+            if (!id) return; // Pula linhas sem ID
+
+            const arquitetoData = {
+                id: id,
+                nome: row[mapping.nome],
+                email: row[mapping.email] || '',
+                telefone: row[mapping.telefone] || '',
+                pix: row[mapping.chave_pix] || ''
+            };
+
+            const arquitetoExistente = this.arquitetos.find(a => a.id === id);
+
+            if (arquitetoExistente) {
+                arquitetosParaAtualizar.push(arquitetoData);
+            } else {
+                novosArquitetos.push({
+                    ...arquitetoData,
+                    salesCount: 0,
+                    valorVendasTotal: 0,
+                    pontos: 0,
+                    rtPercentual: 0.05,
+                    rt_acumulado: 0,
+                    rt_total_pago: 0
+                });
+            }
+        });
+
+        let success = true;
+        let errorMessage = '';
+        let novosCount = 0;
+        let atualizadosCount = 0;
+
+        try {
+            if (novosArquitetos.length > 0) {
+                const { error } = await supabase.from('arquitetos').insert(novosArquitetos);
+                if (error) throw error;
+                novosCount = novosArquitetos.length;
+            }
+
+            if (arquitetosParaAtualizar.length > 0) {
+                const updatePromises = arquitetosParaAtualizar.map(arq =>
+                    supabase.from('arquitetos').update({
+                        nome: arq.nome,
+                        email: arq.email,
+                        telefone: arq.telefone,
+                        pix: arq.pix
+                    }).eq('id', arq.id)
+                );
+                const results = await Promise.all(updatePromises);
+                const updateErrors = results.filter(res => res.error);
+                if (updateErrors.length > 0) {
+                    throw new Error(updateErrors.map(e => e.error.message).join(', '));
+                }
+                atualizadosCount = arquitetosParaAtualizar.length;
+            }
+
+        } catch (error) {
+            success = false;
+            errorMessage = error.message;
+        }
+
+        if (success) {
+            let alertMessage = '';
+            if (novosCount > 0) alertMessage += `${novosCount} novos arquitetos importados.\n`;
+            if (atualizadosCount > 0) alertMessage += `${atualizadosCount} arquitetos atualizados.\n`;
+            if (novosCount === 0 && atualizadosCount === 0) alertMessage = 'Nenhum arquiteto para importar ou atualizar.';
+            
+            alert(alertMessage.trim());
+            await this.logAction(`Importou ${novosCount} e atualizou ${atualizadosCount} arquitetos via planilha.`);
+            await this.loadData();
+            this.renderAll();
+        } else {
+            alert("Ocorreu um erro durante o processo:\n" + errorMessage);
+        }
+
         this.closeArquitetoMappingModal();
     }
 
@@ -1121,7 +1260,7 @@ class RelacionamentoApp {
 
         alert(`${this.eligibleForPayment.length} comprovantes gerados!`);
         await this.logAction(`Gerou ${this.eligibleForPayment.length} pagamentos em lote.`);
-        document.getElementById('gerar-pagamentos-modal').classList.remove('flex');
+        this.closeGerarPagamentosModal();
         this.eligibleForPayment = [];
         await this.loadData();
         this.renderAll();
@@ -1278,7 +1417,11 @@ class RelacionamentoApp {
         document.getElementById('sales-history-modal-title').textContent = `Histórico de Vendas para ${arq ? arq.nome : id}`;
         const container = document.getElementById('sales-history-table-container');
         container.innerHTML = `<p class="text-center text-gray-500 py-8">Consultando... <i class="fas fa-spinner fa-spin"></i></p>`;
-        document.getElementById('sales-history-modal').classList.add('flex');
+        const modal = document.getElementById('sales-history-modal');
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeSalesHistoryModal();
+        };
+        modal.classList.add('flex');
         try {
             const { data, error } = await supabase.from('sysled_imports').select('id_pedido, valor_nota, data_finalizacao_prevenda').eq('id_parceiro', id).order('data_finalizacao_prevenda', { ascending: false });
             if (error) throw error;
@@ -1296,7 +1439,11 @@ class RelacionamentoApp {
         document.getElementById('sales-history-modal-title').textContent = `Vendas da API Sysled para ${arq ? arq.nome : id}`;
         const container = document.getElementById('sales-history-table-container');
         container.innerHTML = `<p class="text-center text-gray-500 py-8">Consultando API... <i class="fas fa-spinner fa-spin"></i></p>`;
-        document.getElementById('sales-history-modal').classList.add('flex');
+        const modal = document.getElementById('sales-history-modal');
+        modal.onclick = (e) => {
+            if (e.target === modal) this.closeSalesHistoryModal();
+        };
+        modal.classList.add('flex');
         try {
             if (this.sysledData.length === 0) await this.fetchSysledData();
             if (this.sysledData.length === 0) { container.innerHTML = `<p class="text-center text-gray-500 py-8">Nenhum dado da API foi carregado.</p>`; return; }
@@ -1543,3 +1690,4 @@ class RelacionamentoApp {
 }
 
 export default RelacionamentoApp;
+
