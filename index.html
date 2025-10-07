@@ -71,6 +71,10 @@
                         <a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="comprovantes">
                             <i class="fas fa-receipt fa-fw"></i><span>Comprovantes</span>
                         </a>
+                        <!-- Nova Aba Resgates -->
+                        <a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="resgates">
+                            <i class="fas fa-gift fa-fw"></i><span>Resgates</span>
+                        </a>
                         <a href="#" class="menu-link flex items-center gap-3 py-2.5 px-3 rounded-md text-sm font-medium" data-tab="arquivos-importados">
                             <i class="fas fa-folder-open fa-fw"></i><span>Arquivos Importados</span>
                         </a>
@@ -148,24 +152,24 @@
                 
                   <!-- Aba: Arquitetos -->
                   <div id="arquitetos-view" class="tab-view">
-                         <h1 class="text-3xl font-bold text-gray-900 mb-6">Cadastro de Arquitetos</h1>
-                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                             <div class="lg:col-span-1 space-y-6"><div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Adicionar Manualmente</h2><form id="add-arquiteto-form" class="space-y-4"><div><label for="arquiteto-id" class="block text-sm font-medium text-gray-600">ID</label><input type="text" id="arquiteto-id" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></div><div><label for="arquiteto-nome" class="block text-sm font-medium text-gray-600">Nome</label><input type="text" id="arquiteto-nome" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></div><div><label for="arquiteto-email" class="block text-sm font-medium text-gray-600">Email</label><input type="email" id="arquiteto-email" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><div><label for="arquiteto-telefone" class="block text-sm font-medium text-gray-600">Telefone</label><input type="tel" id="arquiteto-telefone" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><div><label for="arquiteto-pix" class="block text-sm font-medium text-gray-600">Chave PIX</label><input type="text" id="arquiteto-pix" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg">Adicionar Arquiteto</button></form></div><div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Importar Planilha</h2><div class="text-center"><label for="arquiteto-file-input" class="file-input-label bg-indigo-600 hover:bg-indigo-700"><i class="fas fa-file-excel mr-2"></i>Escolher Planilha</label><input type="file" id="arquiteto-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="file-input"><p id="file-name-arquitetos" class="text-sm text-gray-500 mt-2"></p></div></div></div>
-                             <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
-                                 <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Arquitetos Cadastrados</h2><div class="flex gap-2 items-center"><button id="gerar-pagamentos-rt-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg text-sm"><i class="fas fa-money-check-alt mr-2"></i>Gerar Pagamentos</button><button id="export-csv-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm">Exportar</button><button id="delete-all-arquitetos-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Apagar Todos</button></div></div>
-                                 <div class="mb-4"><input type="text" id="arquiteto-search-input" placeholder="Pesquisar por ID ou Nome..." class="w-full p-3 bg-gray-50 border rounded-lg"></div>
-                                 <div id="arquitetos-table-container" class="overflow-x-auto"></div>
-                             </div>
-                         </div>
-                    </div>
+                       <h1 class="text-3xl font-bold text-gray-900 mb-6">Cadastro de Arquitetos</h1>
+                       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                           <div class="lg:col-span-1 space-y-6"><div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Adicionar Manualmente</h2><form id="add-arquiteto-form" class="space-y-4"><div><label for="arquiteto-id" class="block text-sm font-medium text-gray-600">ID</label><input type="text" id="arquiteto-id" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></div><div><label for="arquiteto-nome" class="block text-sm font-medium text-gray-600">Nome</label><input type="text" id="arquiteto-nome" class="w-full p-2 bg-gray-50 border rounded-lg mt-1" required></div><div><label for="arquiteto-email" class="block text-sm font-medium text-gray-600">Email</label><input type="email" id="arquiteto-email" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><div><label for="arquiteto-telefone" class="block text-sm font-medium text-gray-600">Telefone</label><input type="tel" id="arquiteto-telefone" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><div><label for="arquiteto-pix" class="block text-sm font-medium text-gray-600">Chave PIX</label><input type="text" id="arquiteto-pix" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div><button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg">Adicionar Arquiteto</button></form></div><div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Importar Planilha</h2><div class="text-center"><label for="arquiteto-file-input" class="file-input-label bg-indigo-600 hover:bg-indigo-700"><i class="fas fa-file-excel mr-2"></i>Escolher Planilha</label><input type="file" id="arquiteto-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="file-input"><p id="file-name-arquitetos" class="text-sm text-gray-500 mt-2"></p></div></div></div>
+                           <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
+                               <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Arquitetos Cadastrados</h2><div class="flex gap-2 items-center"><button id="gerar-pagamentos-rt-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg text-sm"><i class="fas fa-money-check-alt mr-2"></i>Gerar Pagamentos</button><button id="export-csv-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm">Exportar</button><button id="delete-all-arquitetos-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Apagar Todos</button></div></div>
+                               <div class="mb-4"><input type="text" id="arquiteto-search-input" placeholder="Pesquisar por ID ou Nome..." class="w-full p-3 bg-gray-50 border rounded-lg"></div>
+                               <div id="arquitetos-table-container" class="overflow-x-auto"></div>
+                           </div>
+                       </div>
+                  </div>
 
                 <!-- Aba: Pontuação -->
                 <div id="pontuacao-view" class="tab-view">
-                         <h1 class="text-3xl font-bold text-gray-900 mb-6">Pontuação</h1>
-                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                             <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Ranking de Arquitetos</h2><div id="ranking-table-container"></div></div>
-                             <div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Ajuste Manual de Pontos</h2><form id="add-pontos-form" class="space-y-4"><div><label for="arquiteto-select" class="block text-sm font-medium text-gray-600 mb-1">Arquiteto</label><select id="arquiteto-select" class="w-full p-3 bg-gray-50 border rounded-lg" required></select></div><div><label for="pontos-valor" class="block text-sm font-medium text-gray-600 mb-1">Pontos (negativo para remover)</label><input type="number" id="pontos-valor" class="w-full p-3 bg-gray-50 border rounded-lg" required></div><button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg">Adicionar</button></form></div>
-                         </div>
+                       <h1 class="text-3xl font-bold text-gray-900 mb-6">Pontuação</h1>
+                       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                           <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Ranking de Arquitetos</h2><div id="ranking-table-container"></div></div>
+                           <div class="bg-white rounded-2xl shadow-lg p-6"><h2 class="text-xl font-semibold mb-4">Ajuste Manual de Pontos</h2><form id="add-pontos-form" class="space-y-4"><div><label for="arquiteto-select" class="block text-sm font-medium text-gray-600 mb-1">Arquiteto</label><select id="arquiteto-select" class="w-full p-3 bg-gray-50 border rounded-lg" required></select></div><div><label for="pontos-valor" class="block text-sm font-medium text-gray-600 mb-1">Pontos (negativo para remover)</label><input type="number" id="pontos-valor" class="w-full p-3 bg-gray-50 border rounded-lg" required></div><button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg">Adicionar</button></form></div>
+                       </div>
                 </div>
 
                 <!-- Aba: Comprovantes -->
@@ -173,6 +177,22 @@
                     <h1 class="text-3xl font-bold text-gray-900 mb-6">Controle de Pagamentos</h1>
                     <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-8"><h2 class="text-xl font-semibold mb-4">Pesquisar Pagamentos</h2><input type="text" id="pagamento-search-input" placeholder="Pesquisar por ID do Parceiro..." class="w-full p-3 bg-gray-50 border rounded-lg"></div>
                     <div id="pagamentos-container" class="space-y-8"></div>
+                </div>
+
+                <!-- Nova Aba: Resgates -->
+                <div id="resgates-view" class="tab-view">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-6">Controle de Resgates</h1>
+                    <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold">Pesquisar Resgates</h2>
+                        </div>
+                        <input type="text" id="resgate-search-input" placeholder="Pesquisar por ID do Parceiro..." class="w-full p-3 bg-gray-50 border rounded-lg">
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <div id="resgates-container" class="overflow-x-auto">
+                            <!-- A tabela de resgates será renderizada aqui pelo JavaScript -->
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Aba: Arquivos Importados -->
@@ -267,7 +287,13 @@
                     <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-600">Chave PIX</label><input type="text" id="edit-arquiteto-pix" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"></div>
                     <div class="md:col-span-2 mt-4 pt-4 border-t"><h3 class="text-lg font-semibold mb-2">Valores de RT</h3><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div class="bg-gray-50 p-4 rounded-lg"><label class="block text-sm font-medium text-gray-600">RT Acumulado (pagamento)</label><p id="edit-arquiteto-rt-acumulado" class="mt-1 text-2xl font-bold text-emerald-600"></p></div><div class="bg-gray-50 p-4 rounded-lg"><label class="block text-sm font-medium text-gray-600">Total de RTs Pagas</label><p id="edit-arquiteto-rt-total-pago" class="mt-1 text-2xl font-bold text-blue-600"></p></div></div></div>
                     <div class="md:col-span-2 mt-4 pt-4 border-t"><h3 class="text-lg font-semibold mb-2">Configurações de Venda</h3><div class="grid grid-cols-3 gap-4 items-end"><div><label class="block text-sm font-medium text-gray-600">Valor Total Vendas</label><p id="rt-valor-vendas" class="mt-1 text-lg font-bold text-gray-800"></p></div><div><label for="rt-percentual" class="block text-sm font-medium text-gray-600">Percentual RT</label><select id="rt-percentual" class="w-full p-2 bg-gray-50 border rounded-lg mt-1"><option value="0.03">3%</option><option value="0.05">5%</option><option value="0.10">10%</option></select></div><div><label class="block text-sm font-medium text-gray-600">Cálculo Exemplo</label><p id="rt-valor-calculado" class="mt-1 text-lg font-bold text-gray-800"></p></div></div></div>
-                    <div class="md:col-span-2 flex justify-end gap-4 mt-6"><button type="button" id="consultar-vendas-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg">Consultar Vendas</button><button type="button" id="consultar-vendas-sysled-btn" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-lg">Vendas Sysled</button><button type="button" id="gerar-pagamento-ficha-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-6 rounded-lg">Gerar Pagamento</button><button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg">Salvar</button></div>
+                    <!-- Botões da Ficha do Arquiteto atualizados -->
+                    <div class="md:col-span-2 flex justify-end gap-4 mt-6">
+                        <button type="button" id="consultar-vendas-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg">Vendas Pilar</button>
+                        <button type="button" id="gerar-resgate-ficha-btn" class="bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-6 rounded-lg">Gerar Resgate</button>
+                        <button type="button" id="gerar-pagamento-ficha-btn" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-6 rounded-lg">Gerar Pagamento</button>
+                        <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg">Salvar</button>
+                    </div>
                 </form>
             </div>
         </div>

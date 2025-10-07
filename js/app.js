@@ -7,6 +7,7 @@ class RelacionamentoApp {
         this.arquitetos = [];
         this.pontuacoes = {};
         this.pagamentos = {};
+        this.resgates = []; // NOVO: Para armazenar resgates separadamente
         this.importedFiles = {};
         this.comissoesManuais = [];
         this.actionLogs = []; // Para armazenar os logs de eventos
@@ -71,12 +72,18 @@ class RelacionamentoApp {
 
         if (pagRes.error) console.error('Erro ao carregar pagamentos:', pagRes.error);
         else {
-            this.pagamentos = (pagRes.data || []).reduce((acc, p) => {
-                const dateKey = new Date(p.data_geracao + 'T00:00:00Z').toLocaleDateString('pt-BR');
-                if (!acc[dateKey]) acc[dateKey] = [];
-                acc[dateKey].push(p);
-                return acc;
-            }, {});
+            this.pagamentos = {}; // Reset
+            this.resgates = [];   // Reset
+            (pagRes.data || []).forEach(p => {
+                // A coluna 'form_pagamento' com valor 2 indica um resgate
+                if (p.form_pagamento === 2) {
+                    this.resgates.push(p);
+                } else { // Pagamentos normais (form_pagamento === 1 ou null/undefined)
+                    const dateKey = new Date(p.data_geracao + 'T00:00:00Z').toLocaleDateString('pt-BR');
+                    if (!this.pagamentos[dateKey]) this.pagamentos[dateKey] = [];
+                    this.pagamentos[dateKey].push(p);
+                }
+            });
         }
 
         if (filesRes.error) console.error('Erro ao carregar arquivos:', filesRes.error);
@@ -106,6 +113,7 @@ class RelacionamentoApp {
         this.renderRankingTable();
         this.populateArquitetoSelect();
         this.renderPagamentos();
+        this.renderResgates(); // NOVO: Renderiza a tabela de resgates
         this.renderArquivosImportados();
         this.renderHistoricoManual();
         this.renderResultados();
@@ -183,7 +191,6 @@ class RelacionamentoApp {
         container.innerHTML = `<div class="max-h-[65vh] overflow-y-auto"><table class="w-full"><thead>${headerRow}</thead><tbody>${rows}</tbody></table></div>`;
     }
 
-    // MODIFICADO: Adicionada a coluna Consultor
     renderPagamentos(filter = '') {
         const container = document.getElementById('pagamentos-container');
         if (!container) return;
@@ -204,16 +211,50 @@ class RelacionamentoApp {
                                 <td class="p-2">${p.id_parceiro}</td>
                                 <td class="p-2">${p.parceiro}</td>
                                 <td class="p-2">${p.consultor || 'N/A'}</td>
-                                <td class="p-2 text-right font-semibold">${formatCurrency(p.rt_valor)}<button class="edit-rt-btn text-blue-500 hover:text-blue-700 ml-2" title="Editar Valor RT" data-date="${date}" data-id="${p.id}"><i class="fas fa-edit fa-xs"></i></button></td>
-                                <td class="p-2 text-center"><input type="checkbox" class="pagamento-status h-5 w-5" data-date="${date}" data-id="${p.id}" ${p.pago ? 'checked' : ''}></td>
-                                <td class="p-2"><div class="flex items-center gap-2"><label for="comprovante-input-${p.id}" class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs py-1 px-3 rounded-md whitespace-nowrap">Anexar</label><input type="file" id="comprovante-input-${p.id}" class="comprovante-input file-input" data-date="${date}" data-id="${p.id}"><span class="file-status-text text-xs ${hasComprovante ? 'text-green-600 font-semibold' : 'text-gray-500'}">${hasComprovante ? 'Comprovante anexado' : 'Nenhum arquivo'}</span></div></td>
-                                <td class="p-2 text-center"><button class="view-comprovante-btn text-blue-600 hover:underline" data-date="${date}" data-id="${p.id}" ${!hasComprovante ? 'disabled' : ''} style="${!hasComprovante ? 'opacity: 0.5; cursor: not-allowed;' : ''}">Ver</button></td>
+                                <td class="p-2 text-right font-semibold">${formatCurrency(p.rt_valor)}<button class="edit-rt-btn text-blue-500 hover:text-blue-700 ml-2" title="Editar Valor RT" data-id="${p.id}"><i class="fas fa-edit fa-xs"></i></button></td>
+                                <td class="p-2 text-center"><input type="checkbox" class="pagamento-status h-5 w-5" data-id="${p.id}" ${p.pago ? 'checked' : ''}></td>
+                                <td class="p-2"><div class="flex items-center gap-2"><label for="comprovante-input-${p.id}" class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs py-1 px-3 rounded-md whitespace-nowrap">Anexar</label><input type="file" id="comprovante-input-${p.id}" class="comprovante-input file-input" data-id="${p.id}"><span class="file-status-text text-xs ${hasComprovante ? 'text-green-600 font-semibold' : 'text-gray-500'}">${hasComprovante ? 'Comprovante anexado' : 'Nenhum arquivo'}</span></div></td>
+                                <td class="p-2 text-center"><button class="view-comprovante-btn text-blue-600 hover:underline" data-id="${p.id}" ${!hasComprovante ? 'disabled' : ''} style="${!hasComprovante ? 'opacity: 0.5; cursor: not-allowed;' : ''}">Ver</button></td>
                             </tr>`;
                 }).join('');
                 container.innerHTML += `<div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Pagamentos Gerados em ${date}</h2><div class="flex items-center gap-2"><button class="gerar-relatorio-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Gerar Relatório</button><button class="download-xlsx-btn bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Baixar XLSX</button><button class="delete-pagamentos-btn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Excluir Lote</button></div></div><div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">Parceiro</th><th class="p-2 text-left">Consultor</th><th class="p-2 text-right">Valor RT</th><th class="p-2 text-center">Pago</th><th class="p-2 text-left">Anexar Comprovante</th><th class="p-2 text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`;
             }
         });
         if (!hasResults && filter) container.innerHTML = `<p class="text-center text-gray-500">Nenhum pagamento encontrado para o ID informado.</p>`;
+    }
+
+    /**
+     * NOVO: Renderiza a tabela unificada de resgates.
+     */
+    renderResgates(filter = '') {
+        const container = document.getElementById('resgates-container');
+        if (!container) return;
+
+        let filteredResgates = this.resgates.filter(p => !filter || (p.id_parceiro && p.id_parceiro.toString().includes(filter)));
+
+        if (filteredResgates.length === 0) {
+            container.innerHTML = `<p class="text-center text-gray-500 py-4">Nenhum resgate encontrado.</p>`;
+            return;
+        }
+        
+        // Ordena por data, o mais recente primeiro
+        filteredResgates.sort((a, b) => new Date(b.data_geracao) - new Date(a.data_geracao));
+
+        const rowsHtml = filteredResgates.map(p => {
+            const hasComprovante = p.comprovante && p.comprovante.url;
+            return `<tr class="border-b text-sm">
+                        <td class="p-2">${formatApiDateToBR(p.data_geracao)}</td>
+                        <td class="p-2">${p.id_parceiro}</td>
+                        <td class="p-2">${p.parceiro}</td>
+                        <td class="p-2">${p.consultor || 'N/A'}</td>
+                        <td class="p-2 text-right font-semibold">${formatCurrency(p.rt_valor)}<button class="edit-rt-btn text-blue-500 hover:text-blue-700 ml-2" title="Editar Valor RT" data-id="${p.id}"><i class="fas fa-edit fa-xs"></i></button></td>
+                        <td class="p-2 text-center"><input type="checkbox" class="pagamento-status h-5 w-5" data-id="${p.id}" ${p.pago ? 'checked' : ''}></td>
+                        <td class="p-2"><div class="flex items-center gap-2"><label for="comprovante-input-${p.id}" class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs py-1 px-3 rounded-md whitespace-nowrap">Anexar</label><input type="file" id="comprovante-input-${p.id}" class="comprovante-input file-input" data-id="${p.id}"><span class="file-status-text text-xs ${hasComprovante ? 'text-green-600 font-semibold' : 'text-gray-500'}">${hasComprovante ? 'Comprovante anexado' : 'Nenhum arquivo'}</span></div></td>
+                        <td class="p-2 text-center"><button class="view-comprovante-btn text-blue-600 hover:underline" data-id="${p.id}" ${!hasComprovante ? 'disabled' : ''} style="${!hasComprovante ? 'opacity: 0.5; cursor: not-allowed;' : ''}">Ver</button></td>
+                    </tr>`;
+        }).join('');
+        
+        container.innerHTML = `<div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">Data</th><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">Parceiro</th><th class="p-2 text-left">Consultor</th><th class="p-2 text-right">Valor RT</th><th class="p-2 text-center">Pago</th><th class="p-2 text-left">Anexar Comprovante</th><th class="p-2 text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
     }
     
     renderRankingTable() {
@@ -298,7 +339,7 @@ class RelacionamentoApp {
     }
     
     renderResultados() {
-        const todosPagamentos = Object.values(this.pagamentos).flat();
+        const todosPagamentos = Object.values(this.pagamentos).flat().concat(this.resgates);
 
         // Cálculos de RTs Pagas
         const pagamentosPagos = todosPagamentos.filter(p => p.pago);
@@ -540,9 +581,16 @@ class RelacionamentoApp {
         document.getElementById('add-value-form').reset();
     }
     
-    openComprovanteModal(date, pagamentoId) {
-        const pagamento = this.pagamentos[date]?.find(p => p.id.toString() === pagamentoId);
+    openComprovanteModal(pagamentoId, type = 'pagamento') {
+        let pagamento;
+        if (type === 'resgate') {
+            pagamento = this.resgates.find(p => p.id.toString() === pagamentoId);
+        } else {
+            pagamento = Object.values(this.pagamentos).flat().find(p => p.id.toString() === pagamentoId);
+        }
+
         if (!pagamento) return;
+
         document.getElementById('comprovante-modal-title').textContent = `Detalhes de Pagamento para ${pagamento.parceiro}`;
         document.getElementById('comprovante-valor-rt').textContent = formatCurrency(pagamento.rt_valor || 0);
         const imgContainer = document.getElementById('comprovante-img-container');
@@ -650,11 +698,18 @@ class RelacionamentoApp {
         modal.onclick = null;
     }
 
-    openEditRtModal(date, pagamentoId) {
-        const pagamento = this.pagamentos[date]?.find(p => p.id.toString() === pagamentoId);
+    openEditRtModal(pagamentoId, type = 'pagamento') {
+        let pagamento;
+        if (type === 'resgate') {
+            pagamento = this.resgates.find(p => p.id.toString() === pagamentoId);
+        } else {
+            pagamento = Object.values(this.pagamentos).flat().find(p => p.id.toString() === pagamentoId);
+        }
         if (!pagamento) return;
+
+        const form = document.getElementById('edit-rt-form');
+        form.dataset.type = type; // Armazena o tipo no dataset do formulário
         document.getElementById('edit-rt-pagamento-id').value = pagamento.id;
-        document.getElementById('edit-rt-pagamento-date').value = date;
         document.getElementById('edit-rt-input').value = parseCurrency(pagamento.rt_valor);
         const modal = document.getElementById('edit-rt-modal');
         modal.onclick = (e) => {
@@ -1052,56 +1107,89 @@ class RelacionamentoApp {
     }
 
     handlePagamentosChange(e) {
-        if (e.target.matches('.pagamento-status')) {
-            const { date, id } = e.target.dataset;
-            this.updatePagamentoStatus(date, id, e.target.checked);
+        const target = e.target;
+        if (!target.matches('.pagamento-status, .comprovante-input')) return;
+    
+        const container = target.closest('#pagamentos-container, #resgates-container');
+        if (!container) return;
+        const type = container.id === 'resgates-container' ? 'resgate' : 'pagamento';
+        const { id } = target.dataset;
+    
+        if (target.matches('.pagamento-status')) {
+            this.updatePagamentoStatus(id, target.checked, type);
         }
-        if (e.target.matches('.comprovante-input')) {
-            const statusSpan = e.target.parentElement.querySelector('.file-status-text');
-            if (e.target.files.length > 0 && statusSpan) {
+        if (target.matches('.comprovante-input')) {
+            const statusSpan = target.parentElement.querySelector('.file-status-text');
+            if (target.files.length > 0 && statusSpan) {
                 statusSpan.textContent = 'Comprovante anexado';
                 statusSpan.className = 'file-status-text text-xs text-green-600 font-semibold';
             }
-            const { date, id } = e.target.dataset;
-            this.handleComprovanteUpload(date, id, e.target.files[0]);
+            this.handleComprovanteUpload(id, target.files[0], type);
         }
     }
 
     handlePagamentosClick(e) {
         const btn = e.target.closest('button');
         if (!btn) return;
+    
+        const container = btn.closest('#pagamentos-container, #resgates-container');
+        if (!container) return;
+        const type = container.id === 'resgates-container' ? 'resgate' : 'pagamento';
         const { date, id } = btn.dataset;
-        if (btn.matches('.view-comprovante-btn') && !btn.disabled) { e.preventDefault(); this.openComprovanteModal(date, id); }
-        if (btn.matches('.delete-pagamentos-btn')) this.deletePagamentosGroup(date);
-        if (btn.matches('.download-xlsx-btn')) this.exportPagamentosXLSX(date);
-        if (btn.matches('.gerar-relatorio-btn')) this.generatePagamentoPrint(date);
-        if (btn.matches('.edit-rt-btn')) this.openEditRtModal(date, id);
+    
+        if (btn.matches('.view-comprovante-btn') && !btn.disabled) { 
+            e.preventDefault(); 
+            this.openComprovanteModal(id, type); 
+        }
+        if (btn.matches('.edit-rt-btn')) { 
+            this.openEditRtModal(id, type); 
+        }
+    
+        // Ações específicas para a view de pagamentos (lotes)
+        if (type === 'pagamento') {
+            if (btn.matches('.delete-pagamentos-btn')) this.deletePagamentosGroup(date);
+            if (btn.matches('.download-xlsx-btn')) this.exportPagamentosXLSX(date);
+            if (btn.matches('.gerar-relatorio-btn')) this.generatePagamentoPrint(date);
+        }
     }
 
-    async updatePagamentoStatus(date, pagamentoId, isChecked) {
-        const pagamento = this.pagamentos[date]?.find(p => p.id.toString() === pagamentoId);
+    async updatePagamentoStatus(pagamentoId, isChecked, type) {
+        let pagamento;
+        if (type === 'resgate') {
+            pagamento = this.resgates.find(p => p.id.toString() === pagamentoId);
+        } else {
+            pagamento = Object.values(this.pagamentos).flat().find(p => p.id.toString() === pagamentoId);
+        }
+
         if (pagamento) {
             const { error } = await supabase.from('pagamentos').update({ pago: isChecked }).eq('id', pagamento.id);
             if (error) alert("Erro: " + error.message);
             else {
                 pagamento.pago = isChecked;
-                await this.logAction(`Marcou pagamento (ID: ${pagamentoId}) para ${pagamento.parceiro} como ${isChecked ? 'PAGO' : 'NÃO PAGO'}.`);
+                await this.logAction(`Marcou ${type} (ID: ${pagamentoId}) para ${pagamento.parceiro} como ${isChecked ? 'PAGO' : 'NÃO PAGO'}.`);
                 this.renderResultados();
             }
         }
     }
 
-    async handleComprovanteUpload(date, pagamentoId, file) {
+    async handleComprovanteUpload(pagamentoId, file, type) {
         if (!file) return;
-        const pagamento = this.pagamentos[date]?.find(p => p.id.toString() === pagamentoId);
+
+        let pagamento;
+        if (type === 'resgate') {
+            pagamento = this.resgates.find(p => p.id.toString() === pagamentoId);
+        } else {
+            pagamento = Object.values(this.pagamentos).flat().find(p => p.id.toString() === pagamentoId);
+        }
+        
         if(pagamento){
             const dataUrl = await fileToBase64(file);
             pagamento.comprovante = { name: file.name, url: dataUrl };
             const { error } = await supabase.from('pagamentos').update({ comprovante: pagamento.comprovante }).eq('id', pagamento.id);
             if(error) alert("Erro: " + error.message);
             else {
-                await this.logAction(`Anexou comprovante para o pagamento (ID: ${pagamentoId}) de ${pagamento.parceiro}.`);
-                this.renderPagamentos();
+                await this.logAction(`Anexou comprovante para o ${type} (ID: ${pagamentoId}) de ${pagamento.parceiro}.`);
+                type === 'resgate' ? this.renderResgates() : this.renderPagamentos();
             }
         }
     }
@@ -1121,19 +1209,27 @@ class RelacionamentoApp {
 
     async handleUpdateRtValue(e) {
         e.preventDefault();
+        const form = e.target;
         const id = document.getElementById('edit-rt-pagamento-id').value;
-        const date = document.getElementById('edit-rt-pagamento-date').value;
+        const type = form.dataset.type;
         const newValue = parseFloat(document.getElementById('edit-rt-input').value);
         if (isNaN(newValue) || newValue < 0) { alert('Valor inválido.'); return; }
-        const pagamento = this.pagamentos[date]?.find(p => p.id.toString() === id);
+        
+        let pagamento;
+        if (type === 'resgate') {
+            pagamento = this.resgates.find(p => p.id.toString() === id);
+        } else {
+            pagamento = Object.values(this.pagamentos).flat().find(p => p.id.toString() === id);
+        }
+
         if (pagamento) {
             const oldValue = pagamento.rt_valor;
             const { error } = await supabase.from('pagamentos').update({ rt_valor: newValue }).eq('id', pagamento.id);
             if (error) { alert("Erro: " + error.message); }
             else {
                 pagamento.rt_valor = newValue;
-                await this.logAction(`Alterou valor do RT (ID: ${id}) de ${formatCurrency(oldValue)} para ${formatCurrency(newValue)}.`);
-                this.renderPagamentos();
+                await this.logAction(`Alterou valor do ${type} (ID: ${id}) de ${formatCurrency(oldValue)} para ${formatCurrency(newValue)}.`);
+                type === 'resgate' ? this.renderResgates() : this.renderPagamentos();
                 this.renderResultados();
                 this.closeEditRtModal();
                 alert('Valor atualizado!');
@@ -1141,7 +1237,6 @@ class RelacionamentoApp {
         }
     }
 
-    // MODIFICADO: Adicionada a coluna Consultor
     exportPagamentosXLSX(date) {
         const data = this.pagamentos[date];
         if (!data || data.length === 0) { alert("Sem dados para exportar."); return; }
@@ -1160,7 +1255,6 @@ class RelacionamentoApp {
         this.logAction(`Exportou o relatório de pagamentos de ${date}.`);
     }
 
-    // MODIFICADO: Adicionada a coluna Chave Pix
     generatePagamentoPrint(date) {
         const data = this.pagamentos[date];
         if (!data || data.length === 0) { alert('Sem dados para gerar relatório.'); return; }
@@ -1208,11 +1302,9 @@ class RelacionamentoApp {
         this.openGerarPagamentosModal();
     }
 
-    // MODIFICADO: Busca o último consultor antes de gerar os comprovantes
     async confirmarGeracaoComprovantes() {
         if (this.eligibleForPayment.length === 0) return;
 
-        // NOVO: Bloco para buscar o último consultor de cada parceiro elegível
         const partnerIds = this.eligibleForPayment.map(a => a.id);
         const { data: consultantData, error: consultantError } = await supabase
             .from('sysled_imports')
@@ -1228,23 +1320,21 @@ class RelacionamentoApp {
         const consultantMap = {};
         if (consultantData) {
             for (const record of consultantData) {
-                // Como está ordenado por data descendente, o primeiro que encontramos para cada parceiro é o mais recente
                 if (!consultantMap[record.id_parceiro]) {
                     consultantMap[record.id_parceiro] = record.consultor;
                 }
             }
         }
-        // FIM DO NOVO BLOCO
 
         const todayDB = new Date().toISOString().slice(0, 10);
-        // MODIFICADO: Adiciona o `consultor` ao objeto de pagamento
         const pagamentos = this.eligibleForPayment.map(a => ({
             id_parceiro: a.id,
             parceiro: a.nome,
             rt_valor: a.rt_acumulado,
             pago: false,
             data_geracao: todayDB,
-            consultor: consultantMap[a.id] || null // Busca o consultor no mapa
+            consultor: consultantMap[a.id] || null,
+            form_pagamento: 1 // Pagamento Comum
         }));
 
         const { error: insertError } = await supabase.from('pagamentos').insert(pagamentos);
@@ -1267,7 +1357,6 @@ class RelacionamentoApp {
         document.querySelector('.menu-link[data-tab="comprovantes"]').click();
     }
 
-    // MODIFICADO: Busca o último consultor antes de gerar o pagamento individual
     async handleGerarPagamentoFicha() {
         const id = document.getElementById('edit-arquiteto-original-id').value;
         const arq = this.arquitetos.find(a => a.id === id);
@@ -1275,7 +1364,6 @@ class RelacionamentoApp {
         const valor = parseFloat(arq.rt_acumulado || 0);
         if (valor <= 0) { alert('Arquiteto sem saldo de RT acumulado.'); return; }
         if (confirm(`Gerar pagamento de ${formatCurrency(valor)} para ${arq.nome}? O saldo será zerado.`)) {
-            // NOVO: Busca o último consultor para este parceiro específico
             const { data: latestImport, error: consultantError } = await supabase
                 .from('sysled_imports')
                 .select('consultor')
@@ -1284,21 +1372,20 @@ class RelacionamentoApp {
                 .limit(1)
                 .single();
             
-            if (consultantError) {
+            if (consultantError && consultantError.code !== 'PGRST116') {
                 console.error("Aviso: Não foi possível encontrar o consultor. O pagamento será gerado sem essa informação.", consultantError);
             }
             const consultantName = latestImport ? latestImport.consultor : null;
-            // FIM DO NOVO BLOCO
 
             const todayDB = new Date().toISOString().slice(0, 10);
-            // MODIFICADO: Adiciona o `consultor` ao objeto de pagamento
             const { error: insertError } = await supabase.from('pagamentos').insert([{
                 id_parceiro: arq.id,
                 parceiro: arq.nome,
                 rt_valor: valor,
                 pago: false,
                 data_geracao: todayDB,
-                consultor: consultantName
+                consultor: consultantName,
+                form_pagamento: 1 // Pagamento comum
             }]);
 
             if (insertError) { alert("Erro ao gerar comprovante: " + insertError.message); return; }
@@ -1313,6 +1400,98 @@ class RelacionamentoApp {
             await this.loadData();
             this.renderAll();
             document.querySelector('.menu-link[data-tab="comprovantes"]').click();
+        }
+    }
+
+    /**
+     * CORRIGIDO: Gera um resgate a partir da ficha do arquiteto, similar ao Gerar Pagamento.
+     */
+    async handleGerarResgateFicha() {
+        console.log("Iniciando handleGerarResgateFicha..."); 
+
+        const id = document.getElementById('edit-arquiteto-original-id').value;
+        const arq = this.arquitetos.find(a => a.id === id);
+
+        if (!arq) {
+            console.error("handleGerarResgateFicha: Arquiteto não encontrado com o ID:", id); 
+            alert('Erro: Arquiteto não encontrado.');
+            return;
+        }
+        console.log("handleGerarResgateFicha: Arquiteto encontrado:", arq);
+
+        const valor = parseFloat(arq.rt_acumulado || 0);
+        console.log("handleGerarResgateFicha: Valor do resgate:", valor); 
+
+        if (valor <= 0) {
+            alert('Arquiteto sem saldo de RT acumulado para resgate.');
+            return;
+        }
+
+        if (confirm(`Gerar resgate de ${formatCurrency(valor)} para ${arq.nome}? O saldo será zerado.`)) {
+            console.log("handleGerarResgateFicha: Usuário confirmou o resgate."); 
+
+            // Busca o último consultor associado a uma venda para este parceiro
+            const { data: latestImport, error: consultantError } = await supabase
+                .from('sysled_imports')
+                .select('consultor')
+                .eq('id_parceiro', arq.id)
+                .order('data_finalizacao_prevenda', { ascending: false })
+                .limit(1)
+                .single();
+            
+            if (consultantError && consultantError.code !== 'PGRST116') { // PGRST116 = no rows found, which is ok
+                console.error("handleGerarResgateFicha: Erro ao buscar consultor:", consultantError);
+            }
+            const consultantName = latestImport ? latestImport.consultor : null;
+            console.log("handleGerarResgateFicha: Consultor encontrado:", consultantName); 
+
+            const todayDB = new Date().toISOString().slice(0, 10);
+            
+            const payload = {
+                id_parceiro: arq.id,
+                parceiro: arq.nome,
+                rt_valor: valor,
+                pago: false,
+                data_geracao: todayDB,
+                consultor: consultantName,
+                form_pagamento: 2 // Identifica o registro como um RESGATE
+            };
+            console.log("handleGerarResgateFicha: Enviando payload para Supabase:", payload); 
+
+            // Insere o novo registro na tabela 'pagamentos' com form_pagamento = 2
+            const { error: insertError } = await supabase.from('pagamentos').insert([payload]);
+
+            if (insertError) {
+                console.error("handleGerarResgateFicha: Erro ao inserir resgate no Supabase:", insertError);
+                alert("Erro ao gerar resgate: " + insertError.message);
+                return;
+            }
+            console.log("handleGerarResgateFicha: Resgate inserido com sucesso.");
+
+            // Zera o saldo acumulado e atualiza o total pago do arquiteto
+            const updatePayload = {
+                rt_acumulado: 0,
+                rt_total_pago: (parseFloat(arq.rt_total_pago) || 0) + valor
+            };
+            console.log("handleGerarResgateFicha: Atualizando arquiteto com payload:", updatePayload);
+            
+            const { error: updateError } = await supabase.from('arquitetos').update(updatePayload).eq('id', arq.id);
+
+            if (updateError) {
+                console.error("handleGerarResgateFicha: Erro ao atualizar saldo do arquiteto:", updateError);
+                alert("Resgate gerado, mas erro ao atualizar saldo do arquiteto: " + updateError.message);
+            } else {
+                console.log("handleGerarResgateFicha: Saldo do arquiteto atualizado com sucesso.");
+                alert(`Resgate de ${formatCurrency(valor)} gerado com sucesso para ${arq.nome}!`);
+                await this.logAction(`Gerou resgate individual de ${formatCurrency(valor)} para ${arq.nome} (ID: ${id}).`);
+            }
+
+            this.closeEditModal();
+            await this.loadData();
+            this.renderAll();
+            document.querySelector('.menu-link[data-tab="resgates"]').click();
+        } else {
+             console.log("handleGerarResgateFicha: Usuário cancelou o resgate.");
         }
     }
     
@@ -1431,30 +1610,6 @@ class RelacionamentoApp {
         }
     }
 
-    async handleConsultarVendasSysledClick(e) {
-        e.preventDefault();
-        const id = document.getElementById('edit-arquiteto-original-id').value;
-        if (!id) return;
-        const arq = this.arquitetos.find(a => a.id === id);
-        document.getElementById('sales-history-modal-title').textContent = `Vendas da API Sysled para ${arq ? arq.nome : id}`;
-        const container = document.getElementById('sales-history-table-container');
-        container.innerHTML = `<p class="text-center text-gray-500 py-8">Consultando API... <i class="fas fa-spinner fa-spin"></i></p>`;
-        const modal = document.getElementById('sales-history-modal');
-        modal.onclick = (e) => {
-            if (e.target === modal) this.closeSalesHistoryModal();
-        };
-        modal.classList.add('flex');
-        try {
-            if (this.sysledData.length === 0) await this.fetchSysledData();
-            if (this.sysledData.length === 0) { container.innerHTML = `<p class="text-center text-gray-500 py-8">Nenhum dado da API foi carregado.</p>`; return; }
-            const sales = this.sysledData.filter(row => String(row.idParceiro) === id && row.statusPagamento == 1);
-            const mapped = sales.map(s => ({ id_pedido: s.idPedido || 'N/A', valor_nota: parseApiNumber(s.valorNota), data_finalizacao_prevenda: s.dataFinalizacaoPrevenda }));
-            this.renderSalesHistoryModal(mapped, true);
-        } catch (error) {
-            container.innerHTML = `<p class="text-center text-red-500 py-8">Erro ao consultar API Sysled.</p>`;
-        }
-    }
-    
     handleSalesHistoryTableClick(e) {
         const btn = e.target.closest('.view-sale-details-btn');
         if (btn) { e.preventDefault(); this.openSaleDetailsModal(btn.dataset.pedidoId); }
@@ -1690,4 +1845,5 @@ class RelacionamentoApp {
 }
 
 export default RelacionamentoApp;
+
 
