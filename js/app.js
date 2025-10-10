@@ -211,14 +211,13 @@ class RelacionamentoApp {
                                 <td class="p-2">${p.id_parceiro}</td>
                                 <td class="p-2">${p.parceiro}</td>
                                 <td class="p-2">${p.consultor || 'N/A'}</td>
-                                <td class="p-2">${p.pedidos || 'N/A'}</td>
                                 <td class="p-2 text-right font-semibold">${formatCurrency(p.rt_valor)}<button class="edit-rt-btn text-blue-500 hover:text-blue-700 ml-2" title="Editar Valor RT" data-id="${p.id}"><i class="fas fa-edit fa-xs"></i></button></td>
                                 <td class="p-2 text-center"><input type="checkbox" class="pagamento-status h-5 w-5" data-id="${p.id}" ${p.pago ? 'checked' : ''}></td>
                                 <td class="p-2"><div class="flex items-center gap-2"><label for="comprovante-input-${p.id}" class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs py-1 px-3 rounded-md whitespace-nowrap">Anexar</label><input type="file" id="comprovante-input-${p.id}" class="comprovante-input file-input" data-id="${p.id}"><span class="file-status-text text-xs ${hasComprovante ? 'text-green-600 font-semibold' : 'text-gray-500'}">${hasComprovante ? 'Comprovante anexado' : 'Nenhum arquivo'}</span></div></td>
                                 <td class="p-2 text-center"><button class="view-comprovante-btn text-blue-600 hover:underline" data-id="${p.id}" ${!hasComprovante ? 'disabled' : ''} style="${!hasComprovante ? 'opacity: 0.5; cursor: not-allowed;' : ''}">Ver</button></td>
                             </tr>`;
                 }).join('');
-                container.innerHTML += `<div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Pagamentos Gerados em ${date}</h2><div class="flex items-center gap-2"><button class="gerar-relatorio-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Gerar Relatório</button><button class="download-xlsx-btn bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Baixar XLSX</button><button class="delete-pagamentos-btn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Excluir Lote</button></div></div><div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">Parceiro</th><th class="p-2 text-left">Consultor</th><th class="p-2 text-left">Pedidos</th><th class="p-2 text-right">Valor RT</th><th class="p-2 text-center">Pago</th><th class="p-2 text-left">Anexar Comprovante</th><th class="p-2 text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`;
+                container.innerHTML += `<div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Pagamentos Gerados em ${date}</h2><div class="flex items-center gap-2"><button class="gerar-relatorio-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Gerar Relatório</button><button class="download-xlsx-btn bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Baixar XLSX</button><button class="delete-pagamentos-btn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Excluir Lote</button></div></div><div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">Parceiro</th><th class="p-2 text-left">Consultor</th><th class="p-2 text-right">Valor RT</th><th class="p-2 text-center">Pago</th><th class="p-2 text-left">Anexar Comprovante</th><th class="p-2 text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`;
             }
         });
         if (!hasResults && filter) container.innerHTML = `<p class="text-center text-gray-500">Nenhum pagamento encontrado para o ID informado.</p>`;
@@ -248,7 +247,6 @@ class RelacionamentoApp {
                         <td class="p-2">${p.id_parceiro}</td>
                         <td class="p-2">${p.parceiro}</td>
                         <td class="p-2">${p.consultor || 'N/A'}</td>
-                        <td class="p-2">${p.pedidos || 'N/A'}</td>
                         <td class="p-2 text-right font-semibold">${formatCurrency(p.rt_valor)}<button class="edit-rt-btn text-blue-500 hover:text-blue-700 ml-2" title="Editar Valor RT" data-id="${p.id}"><i class="fas fa-edit fa-xs"></i></button></td>
                         <td class="p-2 text-center"><input type="checkbox" class="pagamento-status h-5 w-5" data-id="${p.id}" ${p.pago ? 'checked' : ''}></td>
                         <td class="p-2"><div class="flex items-center gap-2"><label for="comprovante-input-${p.id}" class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs py-1 px-3 rounded-md whitespace-nowrap">Anexar</label><input type="file" id="comprovante-input-${p.id}" class="comprovante-input file-input" data-id="${p.id}"><span class="file-status-text text-xs ${hasComprovante ? 'text-green-600 font-semibold' : 'text-gray-500'}">${hasComprovante ? 'Comprovante anexado' : 'Nenhum arquivo'}</span></div></td>
@@ -256,7 +254,7 @@ class RelacionamentoApp {
                     </tr>`;
         }).join('');
         
-        container.innerHTML = `<div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">Data</th><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">Parceiro</th><th class="p-2 text-left">Consultor</th><th class="p-2 text-left">Pedidos</th><th class="p-2 text-right">Valor RT</th><th class="p-2 text-center">Pago</th><th class="p-2 text-left">Anexar Comprovante</th><th class="p-2 text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
+        container.innerHTML = `<div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">Data</th><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">Parceiro</th><th class="p-2 text-left">Consultor</th><th class="p-2 text-right">Valor RT</th><th class="p-2 text-center">Pago</th><th class="p-2 text-left">Anexar Comprovante</th><th class="p-2 text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
     }
     
     renderRankingTable() {
@@ -1246,7 +1244,6 @@ class RelacionamentoApp {
             'ID Parceiro': p.id_parceiro,
             'Parceiro': p.parceiro,
             'Consultor': p.consultor || '',
-            'Pedidos': p.pedidos || '',
             'Valor RT': parseCurrency(p.rt_valor),
             'Pago': p.pago ? 'Sim' : 'Não',
             'Data Geração': p.data_geracao
@@ -1271,7 +1268,6 @@ class RelacionamentoApp {
                 <td class="p-2">${p.parceiro}</td>
                 <td class="p-2">${chavePix}</td>
                 <td class="p-2">${p.consultor || ''}</td>
-                <td class="p-2">${p.pedidos || ''}</td>
                 <td class="p-2 text-right">${formatCurrency(p.rt_valor)}</td>
             </tr>`;
         }).join('');
@@ -1284,7 +1280,6 @@ class RelacionamentoApp {
                 <th class="p-2 text-left">Parceiro</th>
                 <th class="p-2 text-left">Chave Pix</th>
                 <th class="p-2 text-left">Consultor</th>
-                <th class="p-2 text-left">Pedidos</th>
                 <th class="p-2 text-right">Valor RT</th>
               </tr>
             </thead>
@@ -1311,46 +1306,24 @@ class RelacionamentoApp {
         if (this.eligibleForPayment.length === 0) return;
 
         const partnerIds = this.eligibleForPayment.map(a => a.id);
-        const { data: importData, error: importError } = await supabase
+        const { data: consultantData, error: consultantError } = await supabase
             .from('sysled_imports')
-            .select('id_parceiro, consultor, id_pedido, data_finalizacao_prevenda')
-            .in('id_parceiro', partnerIds);
+            .select('id_parceiro, consultor, data_finalizacao_prevenda')
+            .in('id_parceiro', partnerIds)
+            .order('data_finalizacao_prevenda', { ascending: false });
 
-        if (importError) {
-            alert("Erro ao buscar dados de importação: " + importError.message);
+        if (consultantError) {
+            alert("Erro ao buscar dados do consultor: " + consultantError.message);
             return;
         }
 
-        const partnerDataMap = {};
-        if (importData) {
-            for (const record of importData) {
-                const partnerId = record.id_parceiro;
-                if (!partnerDataMap[partnerId]) {
-                    partnerDataMap[partnerId] = {
-                        consultants: [],
-                        pedidos: new Set()
-                    };
-                }
-                if (record.id_pedido) {
-                    partnerDataMap[partnerId].pedidos.add(record.id_pedido);
-                }
-                if (record.consultor && record.data_finalizacao_prevenda) {
-                   partnerDataMap[partnerId].consultants.push({
-                       consultor: record.consultor,
-                       date: new Date(record.data_finalizacao_prevenda)
-                   });
+        const consultantMap = {};
+        if (consultantData) {
+            for (const record of consultantData) {
+                if (!consultantMap[record.id_parceiro]) {
+                    consultantMap[record.id_parceiro] = record.consultor;
                 }
             }
-        }
-        
-        const finalPartnerInfo = {};
-        for (const partnerId in partnerDataMap) {
-            const data = partnerDataMap[partnerId];
-            data.consultants.sort((a, b) => b.date - a.date); // Sort to find the most recent
-            finalPartnerInfo[partnerId] = {
-                consultor: data.consultants.length > 0 ? data.consultants[0].consultor : null,
-                pedidos: Array.from(data.pedidos).join(', ')
-            };
         }
 
         const todayDB = new Date().toISOString().slice(0, 10);
@@ -1360,8 +1333,7 @@ class RelacionamentoApp {
             rt_valor: a.rt_acumulado,
             pago: false,
             data_geracao: todayDB,
-            consultor: finalPartnerInfo[a.id]?.consultor || null,
-            pedidos: finalPartnerInfo[a.id]?.pedidos || null,
+            consultor: consultantMap[a.id] || null,
             form_pagamento: 1 // Pagamento Comum
         }));
 
@@ -1392,20 +1364,18 @@ class RelacionamentoApp {
         const valor = parseFloat(arq.rt_acumulado || 0);
         if (valor <= 0) { alert('Arquiteto sem saldo de RT acumulado.'); return; }
         if (confirm(`Gerar pagamento de ${formatCurrency(valor)} para ${arq.nome}? O saldo será zerado.`)) {
-            const { data: importData, error: importError } = await supabase
+            const { data: latestImport, error: consultantError } = await supabase
                 .from('sysled_imports')
-                .select('consultor, id_pedido, data_finalizacao_prevenda')
+                .select('consultor')
                 .eq('id_parceiro', arq.id)
-                .order('data_finalizacao_prevenda', { ascending: false });
+                .order('data_finalizacao_prevenda', { ascending: false })
+                .limit(1)
+                .single();
             
-            if (importError && importError.code !== 'PGRST116') {
-                console.error("Aviso: Não foi possível encontrar dados de importação.", importError);
+            if (consultantError && consultantError.code !== 'PGRST116') {
+                console.error("Aviso: Não foi possível encontrar o consultor. O pagamento será gerado sem essa informação.", consultantError);
             }
-
-            const consultantName = importData && importData.length > 0 ? importData[0].consultor : null;
-            const pedidos = importData && importData.length > 0
-                ? [...new Set(importData.map(item => item.id_pedido).filter(Boolean))].join(', ')
-                : null;
+            const consultantName = latestImport ? latestImport.consultor : null;
 
             const todayDB = new Date().toISOString().slice(0, 10);
             const { error: insertError } = await supabase.from('pagamentos').insert([{
@@ -1415,7 +1385,6 @@ class RelacionamentoApp {
                 pago: false,
                 data_geracao: todayDB,
                 consultor: consultantName,
-                pedidos: pedidos,
                 form_pagamento: 1 // Pagamento comum
             }]);
 
@@ -1461,23 +1430,20 @@ class RelacionamentoApp {
         if (confirm(`Gerar resgate de ${formatCurrency(valor)} para ${arq.nome}? O saldo será zerado.`)) {
             console.log("handleGerarResgateFicha: Usuário confirmou o resgate."); 
 
-            const { data: importData, error: importError } = await supabase
+            // Busca o último consultor associado a uma venda para este parceiro
+            const { data: latestImport, error: consultantError } = await supabase
                 .from('sysled_imports')
-                .select('consultor, id_pedido, data_finalizacao_prevenda')
+                .select('consultor')
                 .eq('id_parceiro', arq.id)
-                .order('data_finalizacao_prevenda', { ascending: false });
+                .order('data_finalizacao_prevenda', { ascending: false })
+                .limit(1)
+                .single();
             
-            if (importError && importError.code !== 'PGRST116') {
-                console.error("handleGerarResgateFicha: Erro ao buscar dados de importação:", importError);
+            if (consultantError && consultantError.code !== 'PGRST116') { // PGRST116 = no rows found, which is ok
+                console.error("handleGerarResgateFicha: Erro ao buscar consultor:", consultantError);
             }
-
-            const consultantName = importData && importData.length > 0 ? importData[0].consultor : null;
-            const pedidos = importData && importData.length > 0
-                ? [...new Set(importData.map(item => item.id_pedido).filter(Boolean))].join(', ')
-                : null;
-            
-            console.log("handleGerarResgateFicha: Consultor encontrado:", consultantName);
-            console.log("handleGerarResgateFicha: Pedidos encontrados:", pedidos);
+            const consultantName = latestImport ? latestImport.consultor : null;
+            console.log("handleGerarResgateFicha: Consultor encontrado:", consultantName); 
 
             const todayDB = new Date().toISOString().slice(0, 10);
             
@@ -1488,7 +1454,6 @@ class RelacionamentoApp {
                 pago: false,
                 data_geracao: todayDB,
                 consultor: consultantName,
-                pedidos: pedidos,
                 form_pagamento: 2 // Identifica o registro como um RESGATE
             };
             console.log("handleGerarResgateFicha: Enviando payload para Supabase:", payload); 
@@ -1880,3 +1845,5 @@ class RelacionamentoApp {
 }
 
 export default RelacionamentoApp;
+
+
