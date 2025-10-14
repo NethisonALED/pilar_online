@@ -1,0 +1,7 @@
+# Arquivo de segredos e variáveis de ambiente
+.env
+
+# Outras coisas que você pode querer ignorar...
+node_modules/
+__pycache__/
+*.pyc
