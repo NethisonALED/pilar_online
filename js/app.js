@@ -1,7 +1,9 @@
 import { supabase, parseCurrency, formatCurrency, fileToBase64, jsonToXLSXDataURL, formatApiDateToBR, formatApiNumberToBR, parseApiNumber } from './utils.js';
 import { initializeEventListeners } from './events.js';
-
 class RelacionamentoApp {
+
+        
+    
     constructor() {
         // Estado da aplicação
         this.arquitetos = [];
@@ -149,42 +151,42 @@ class RelacionamentoApp {
         });
 
         if (filteredArquitetos.length === 0) {
-            container.innerHTML = `<p class="text-center text-gray-500 py-4">Nenhum arquiteto encontrado.</p>`;
+            container.innerHTML = `<p class="text-center text-gray-400 py-4">Nenhum arquiteto encontrado.</p>`;
             return;
         }
 
         const getSortIcon = (column) => {
             if (this.sortColumn !== column) return '<i class="fas fa-sort text-gray-300 ml-1"></i>';
-            return this.sortDirection === 'asc' ? '<i class="fas fa-sort-up text-emerald-600 ml-1"></i>' : '<i class="fas fa-sort-down text-emerald-600 ml-1"></i>';
+            return this.sortDirection === 'asc' ? '<i class="fas fa-sort-up text-primary ml-1"></i>' : '<i class="fas fa-sort-down text-primary ml-1"></i>';
         };
 
-        const headerRtAcumulado = this.schemaHasRtAcumulado ? `<th class="p-2 text-right sortable-header cursor-pointer" data-sort="rt_acumulado">RT Acumulado ${getSortIcon('rt_acumulado')}</th>` : '';
-        const headerRtTotal = this.schemaHasRtTotalPago ? `<th class="p-2 text-right sortable-header cursor-pointer" data-sort="rt_total_pago">Total Pago ${getSortIcon('rt_total_pago')}</th>` : '';
-        const headerRow = `<tr class="bg-gray-100 text-xs uppercase">
-                                <th class="p-2 text-left sortable-header cursor-pointer" data-sort="id">ID ${getSortIcon('id')}</th>
-                                <th class="p-2 text-left sortable-header cursor-pointer" data-sort="nome">Nome ${getSortIcon('nome')}</th>
-                                <th class="p-2 text-center sortable-header cursor-pointer" data-sort="salesCount">Vendas ${getSortIcon('salesCount')}</th>
-                                <th class="p-2 text-right sortable-header cursor-pointer" data-sort="valorVendasTotal">Valor Vendas ${getSortIcon('valorVendasTotal')}</th>
+        const headerRtAcumulado = this.schemaHasRtAcumulado ? `<th class="sortable-header cursor-pointer" data-sort="rt_acumulado">RT Acumulado ${getSortIcon('rt_acumulado')}</th>` : '';
+        const headerRtTotal = this.schemaHasRtTotalPago ? `<th class="sortable-header cursor-pointer" data-sort="rt_total_pago">Total Pago ${getSortIcon('rt_total_pago')}</th>` : '';
+        const headerRow = `<tr>
+                                <th class="sortable-header cursor-pointer" data-sort="id">ID ${getSortIcon('id')}</th>
+                                <th class="sortable-header cursor-pointer" data-sort="nome">Nome ${getSortIcon('nome')}</th>
+                                <th class="sortable-header cursor-pointer text-center" data-sort="salesCount">Vendas ${getSortIcon('salesCount')}</th>
+                                <th class="sortable-header cursor-pointer text-right" data-sort="valorVendasTotal">Valor Vendas ${getSortIcon('valorVendasTotal')}</th>
                                 ${headerRtAcumulado}${headerRtTotal}
-                                <th class="p-2 text-center">Ações</th></tr>`;
+                                <th class="text-center">Ações</th></tr>`;
 
         const rows = filteredArquitetos.map(a => {
             let cellRtAcumulado = '';
             if (this.schemaHasRtAcumulado) {
                 const rtAcumulado = a.rt_acumulado || 0;
-                cellRtAcumulado = `<td class="p-2 text-right font-bold ${rtAcumulado >= 300 ? 'text-green-600' : ''}">${formatCurrency(rtAcumulado)}</td>`;
+                cellRtAcumulado = `<td class="text-right font-semibold ${rtAcumulado >= 300 ? 'text-primary' : ''}">${formatCurrency(rtAcumulado)}</td>`;
             }
-            const cellRtTotal = this.schemaHasRtTotalPago ? `<td class="p-2 text-right">${formatCurrency(a.rt_total_pago || 0)}</td>` : '';
-            return `<tr class="border-b text-sm hover:bg-gray-50">
-                <td class="p-2"><a href="#" class="id-link text-blue-600 hover:underline" data-id="${a.id}">${a.id}</a></td>
-                <td class="p-2">${a.nome}</td>
-                <td class="p-2 text-center">${a.salesCount || 0}</td>
-                <td class="p-2 text-right">${formatCurrency(a.valorVendasTotal || 0)}</td>
+            const cellRtTotal = this.schemaHasRtTotalPago ? `<td class="text-right">${formatCurrency(a.rt_total_pago || 0)}</td>` : '';
+            return `<tr>
+                <td><a href="#" class="id-link text-primary/80 hover:text-primary font-semibold" data-id="${a.id}">${a.id}</a></td>
+                <td>${a.nome}</td>
+                <td class="text-center">${a.salesCount || 0}</td>
+                <td class="text-right">${formatCurrency(a.valorVendasTotal || 0)}</td>
                 ${cellRtAcumulado}${cellRtTotal}
-                <td class="p-2 text-center">
-                    <button class="add-value-btn text-green-500 hover:text-green-700" title="Adicionar Valor Manual" data-id="${a.id}"><i class="fas fa-dollar-sign"></i></button>
-                    <button class="edit-btn text-blue-500 hover:text-blue-700 ml-4" title="Editar" data-id="${a.id}"><i class="fas fa-edit"></i></button>
-                    <button class="delete-btn text-red-500 hover:text-red-700 ml-4" title="Apagar" data-id="${a.id}"><i class="fas fa-trash"></i></button>
+                <td class="text-center">
+                    <button class="add-value-btn text-green-400 hover:text-green-300" title="Adicionar Valor Manual" data-id="${a.id}"><span class="material-symbols-outlined">add_circle</span></button>
+                    <button class="edit-btn text-blue-400 hover:text-blue-300 ml-2" title="Editar" data-id="${a.id}"><span class="material-symbols-outlined">edit</span></button>
+                    <button class="delete-btn text-red-500 hover:text-red-400 ml-2" title="Apagar" data-id="${a.id}"><span class="material-symbols-outlined">delete</span></button>
                 </td></tr>`;
         }).join('');
         
@@ -197,7 +199,7 @@ class RelacionamentoApp {
         container.innerHTML = '';
         const dates = Object.keys(this.pagamentos).sort((a,b) => new Date(b.split('/').reverse().join('-')) - new Date(a.split('/').reverse().join('-')));
         if (dates.length === 0) {
-            container.innerHTML = `<p class="text-center text-gray-500">Nenhum pagamento foi gerado ainda.</p>`; return;
+            container.innerHTML = `<div class="glass-card rounded-lg p-6 text-center text-gray-400">Nenhum pagamento foi gerado ainda.</div>`; return;
         }
 
         let hasResults = false;
@@ -207,20 +209,20 @@ class RelacionamentoApp {
                 hasResults = true;
                 const rowsHtml = pagamentosDoDia.map(p => {
                     const hasComprovante = p.comprovante && p.comprovante.url;
-                    return `<tr class="border-b text-sm">
-                                <td class="p-2">${p.id_parceiro}</td>
-                                <td class="p-2">${p.parceiro}</td>
-                                <td class="p-2">${p.consultor || 'N/A'}</td>
-                                <td class="p-2 text-right font-semibold">${formatCurrency(p.rt_valor)}<button class="edit-rt-btn text-blue-500 hover:text-blue-700 ml-2" title="Editar Valor RT" data-id="${p.id}"><i class="fas fa-edit fa-xs"></i></button></td>
-                                <td class="p-2 text-center"><input type="checkbox" class="pagamento-status h-5 w-5" data-id="${p.id}" ${p.pago ? 'checked' : ''}></td>
-                                <td class="p-2"><div class="flex items-center gap-2"><label for="comprovante-input-${p.id}" class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs py-1 px-3 rounded-md whitespace-nowrap">Anexar</label><input type="file" id="comprovante-input-${p.id}" class="comprovante-input file-input" data-id="${p.id}"><span class="file-status-text text-xs ${hasComprovante ? 'text-green-600 font-semibold' : 'text-gray-500'}">${hasComprovante ? 'Comprovante anexado' : 'Nenhum arquivo'}</span></div></td>
-                                <td class="p-2 text-center"><button class="view-comprovante-btn text-blue-600 hover:underline" data-id="${p.id}" ${!hasComprovante ? 'disabled' : ''} style="${!hasComprovante ? 'opacity: 0.5; cursor: not-allowed;' : ''}">Ver</button></td>
+                    return `<tr>
+                                <td>${p.id_parceiro}</td>
+                                <td>${p.parceiro}</td>
+                                <td>${p.consultor || 'N/A'}</td>
+                                <td class="text-right font-semibold">${formatCurrency(p.rt_valor)}<button class="edit-rt-btn text-blue-400 hover:text-blue-300 ml-2" title="Editar Valor RT" data-id="${p.id}"><span class="material-symbols-outlined text-base align-middle">edit</span></button></td>
+                                <td class="text-center"><input type="checkbox" class="pagamento-status h-5 w-5 rounded bg-background-dark border-white/20 text-primary focus:ring-primary" data-id="${p.id}" ${p.pago ? 'checked' : ''}></td>
+                                <td><div class="flex items-center gap-2"><label for="comprovante-input-${p.id}" class="file-input-label bg-white/10 hover:bg-white/20 text-xs py-1 px-3 !font-medium whitespace-nowrap">Anexar</label><input type="file" id="comprovante-input-${p.id}" class="comprovante-input file-input" data-id="${p.id}"><span class="file-status-text text-xs ${hasComprovante ? 'text-green-400 font-semibold' : 'text-gray-400'}">${hasComprovante ? 'Comprovante anexado' : 'Nenhum arquivo'}</span></div></td>
+                                <td class="text-center"><button class="view-comprovante-btn text-primary/80 hover:text-primary font-semibold" data-id="${p.id}" ${!hasComprovante ? 'disabled' : ''} style="${!hasComprovante ? 'opacity: 0.5; cursor: not-allowed;' : ''}">Ver</button></td>
                             </tr>`;
                 }).join('');
-                container.innerHTML += `<div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-semibold">Pagamentos Gerados em ${date}</h2><div class="flex items-center gap-2"><button class="gerar-relatorio-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Gerar Relatório</button><button class="download-xlsx-btn bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Baixar XLSX</button><button class="delete-pagamentos-btn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg text-xs" data-date="${date}">Excluir Lote</button></div></div><div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">Parceiro</th><th class="p-2 text-left">Consultor</th><th class="p-2 text-right">Valor RT</th><th class="p-2 text-center">Pago</th><th class="p-2 text-left">Anexar Comprovante</th><th class="p-2 text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`;
+                container.innerHTML += `<div class="payment-group-card"><div class="flex flex-wrap justify-between items-center mb-4 gap-4"><h2 class="text-xl font-semibold">Pagamentos Gerados em ${date}</h2><div class="flex items-center gap-2"><button class="gerar-relatorio-btn btn-modal !py-1 !px-3 !text-xs bg-blue-500/80 hover:bg-blue-500" data-date="${date}">Gerar Relatório</button><button class="download-xlsx-btn btn-modal !py-1 !px-3 !text-xs bg-green-500/80 hover:bg-green-500" data-date="${date}">Baixar XLSX</button><button class="delete-pagamentos-btn btn-modal !py-1 !px-3 !text-xs bg-red-600/80 hover:bg-red-600" data-date="${date}">Excluir Lote</button></div></div><div class="overflow-x-auto"><table><thead><tr><th>ID Parceiro</th><th>Parceiro</th><th>Consultor</th><th class="text-right">Valor RT</th><th class="text-center">Pago</th><th>Anexar Comprovante</th><th class="text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`;
             }
         });
-        if (!hasResults && filter) container.innerHTML = `<p class="text-center text-gray-500">Nenhum pagamento encontrado para o ID informado.</p>`;
+        if (!hasResults && filter) container.innerHTML = `<div class="glass-card rounded-lg p-6 text-center text-gray-400">Nenhum pagamento encontrado para o ID informado.</div>`;
     }
 
     /**
@@ -233,7 +235,7 @@ class RelacionamentoApp {
         let filteredResgates = this.resgates.filter(p => !filter || (p.id_parceiro && p.id_parceiro.toString().includes(filter)));
 
         if (filteredResgates.length === 0) {
-            container.innerHTML = `<p class="text-center text-gray-500 py-4">Nenhum resgate encontrado.</p>`;
+            container.innerHTML = `<p class="text-center text-gray-400 py-4">Nenhum resgate encontrado.</p>`;
             return;
         }
         
@@ -242,36 +244,36 @@ class RelacionamentoApp {
 
         const rowsHtml = filteredResgates.map(p => {
             const hasComprovante = p.comprovante && p.comprovante.url;
-            return `<tr class="border-b text-sm">
-                        <td class="p-2">${formatApiDateToBR(p.data_geracao)}</td>
-                        <td class="p-2">${p.id_parceiro}</td>
-                        <td class="p-2">${p.parceiro}</td>
-                        <td class="p-2">${p.consultor || 'N/A'}</td>
-                        <td class="p-2 text-right font-semibold">${formatCurrency(p.rt_valor)}<button class="edit-rt-btn text-blue-500 hover:text-blue-700 ml-2" title="Editar Valor RT" data-id="${p.id}"><i class="fas fa-edit fa-xs"></i></button></td>
-                        <td class="p-2 text-center"><input type="checkbox" class="pagamento-status h-5 w-5" data-id="${p.id}" ${p.pago ? 'checked' : ''}></td>
-                        <td class="p-2"><div class="flex items-center gap-2"><label for="comprovante-input-${p.id}" class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs py-1 px-3 rounded-md whitespace-nowrap">Anexar</label><input type="file" id="comprovante-input-${p.id}" class="comprovante-input file-input" data-id="${p.id}"><span class="file-status-text text-xs ${hasComprovante ? 'text-green-600 font-semibold' : 'text-gray-500'}">${hasComprovante ? 'Comprovante anexado' : 'Nenhum arquivo'}</span></div></td>
-                        <td class="p-2 text-center"><button class="view-comprovante-btn text-blue-600 hover:underline" data-id="${p.id}" ${!hasComprovante ? 'disabled' : ''} style="${!hasComprovante ? 'opacity: 0.5; cursor: not-allowed;' : ''}">Ver</button></td>
+            return `<tr>
+                        <td>${formatApiDateToBR(p.data_geracao)}</td>
+                        <td>${p.id_parceiro}</td>
+                        <td>${p.parceiro}</td>
+                        <td>${p.consultor || 'N/A'}</td>
+                        <td class="text-right font-semibold">${formatCurrency(p.rt_valor)}<button class="edit-rt-btn text-blue-400 hover:text-blue-300 ml-2" title="Editar Valor RT" data-id="${p.id}"><span class="material-symbols-outlined text-base align-middle">edit</span></button></td>
+                        <td class="text-center"><input type="checkbox" class="pagamento-status h-5 w-5 rounded bg-background-dark border-white/20 text-primary focus:ring-primary" data-id="${p.id}" ${p.pago ? 'checked' : ''}></td>
+                        <td><div class="flex items-center gap-2"><label for="comprovante-input-${p.id}" class="file-input-label bg-white/10 hover:bg-white/20 text-xs py-1 px-3 !font-medium whitespace-nowrap">Anexar</label><input type="file" id="comprovante-input-${p.id}" class="comprovante-input file-input" data-id="${p.id}"><span class="file-status-text text-xs ${hasComprovante ? 'text-green-400 font-semibold' : 'text-gray-400'}">${hasComprovante ? 'Comprovante anexado' : 'Nenhum arquivo'}</span></div></td>
+                        <td class="text-center"><button class="view-comprovante-btn text-primary/80 hover:text-primary font-semibold" data-id="${p.id}" ${!hasComprovante ? 'disabled' : ''} style="${!hasComprovante ? 'opacity: 0.5; cursor: not-allowed;' : ''}">Ver</button></td>
                     </tr>`;
         }).join('');
         
-        container.innerHTML = `<div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">Data</th><th class="p-2 text-left">ID Parceiro</th><th class="p-2 text-left">Parceiro</th><th class="p-2 text-left">Consultor</th><th class="p-2 text-right">Valor RT</th><th class="p-2 text-center">Pago</th><th class="p-2 text-left">Anexar Comprovante</th><th class="p-2 text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
+        container.innerHTML = `<div class="overflow-x-auto"><table><thead><tr><th>Data</th><th>ID Parceiro</th><th>Parceiro</th><th>Consultor</th><th class="text-right">Valor RT</th><th class="text-center">Pago</th><th>Anexar Comprovante</th><th class="text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
     }
     
     renderRankingTable() {
         const container = document.getElementById('ranking-table-container');
         const ranking = this.arquitetos.map(a => ({ ...a, pontos: this.pontuacoes[a.id] || 0 })).sort((a, b) => b.pontos - a.pontos);
         if (ranking.length === 0) {
-            container.innerHTML = `<p class="text-center text-gray-500">Nenhum arquiteto para exibir.</p>`; return;
+            container.innerHTML = `<p class="text-center text-gray-400">Nenhum arquiteto para exibir.</p>`; return;
         }
-        const rows = ranking.map(a => `<tr class="border-b text-sm"><td class="p-2">${a.id}</td><td class="p-2">${a.nome}</td><td class="p-2 font-bold">${a.pontos}</td></tr>`).join('');
-        container.innerHTML = `<table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID</th><th class="p-2 text-left">Nome</th><th class="p-2 text-left">Pontos</th></tr></thead><tbody>${rows}</tbody></table>`;
+        const rows = ranking.map(a => `<tr><td>${a.id}</td><td>${a.nome}</td><td class="font-bold text-primary">${a.pontos}</td></tr>`).join('');
+        container.innerHTML = `<table><thead><tr><th>ID</th><th>Nome</th><th>Pontos</th></tr></thead><tbody>${rows}</tbody></table>`;
     }
     
     populateArquitetoSelect() {
         const select = document.getElementById('arquiteto-select');
-        select.innerHTML = '<option value="">Selecione um arquiteto</option>';
+        select.innerHTML = '<option value="" class="bg-background-dark">Selecione um arquiteto</option>';
         this.arquitetos.sort((a, b) => a.nome.localeCompare(b.nome)).forEach(a => {
-            select.innerHTML += `<option value="${a.id}">${a.nome}</option>`;
+            select.innerHTML += `<option value="${a.id}" class="bg-background-dark">${a.nome}</option>`;
         });
     }
 
@@ -280,11 +282,11 @@ class RelacionamentoApp {
         container.innerHTML = '';
         const dates = Object.keys(this.importedFiles).sort((a,b) => new Date(b.split('/').reverse().join('-')) - new Date(a.split('/').reverse().join('-')));
         if (dates.length === 0) {
-            container.innerHTML = `<p class="text-center text-gray-500">Nenhum arquivo foi importado.</p>`; return;
+            container.innerHTML = `<div class="glass-card rounded-lg p-6 text-center text-gray-400">Nenhum arquivo foi importado.</div>`; return;
         }
         dates.forEach(date => {
             const fileInfo = this.importedFiles[date];
-            container.innerHTML += `<div class="bg-white rounded-2xl shadow-lg p-6"><div class="flex justify-between items-center"><div><h3 class="font-semibold text-lg">Importação de ${date}</h3><p class="text-sm text-gray-500 mt-1">${fileInfo.name}</p></div><button class="download-arquivo-btn bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center gap-2" data-date="${date}"><i class="fas fa-download"></i> Baixar</button></div></div>`;
+            container.innerHTML += `<div class="imported-file-card"><div class="flex flex-wrap justify-between items-center gap-4"><div><h3 class="font-semibold text-lg text-white">Importação de ${date}</h3><p class="text-sm text-gray-400 mt-1">${fileInfo.name}</p></div><button class="download-arquivo-btn btn-modal !py-2 !px-4 !text-sm bg-indigo-500/80 hover:bg-indigo-500 flex items-center gap-2" data-date="${date}"><span class="material-symbols-outlined">download</span>Baixar</button></div></div>`;
         });
     }
 
@@ -294,43 +296,44 @@ class RelacionamentoApp {
     
         let rowsHtml = '';
         if (this.comissoesManuais.length === 0) {
-            rowsHtml = `<tr><td colspan="7" class="text-center text-gray-500 py-4">Nenhuma comissão manual adicionada ainda.</td></tr>`;
+            rowsHtml = `<tr><td colspan="7" class="text-center text-gray-400 py-4">Nenhuma comissão manual adicionada ainda.</td></tr>`;
         } else {
             rowsHtml = this.comissoesManuais.map(c => {
                 const status = c.status || 'pendente';
-                let statusColor;
-                if (status === 'aprovada') {
-                    statusColor = 'bg-green-100 text-green-800';
-                } else if (status === 'Recusada Gestão') {
-                    statusColor = 'bg-red-100 text-red-800';
-                } else {
-                    statusColor = 'bg-yellow-100 text-yellow-800';
+                let statusColor, statusText;
+                switch (status) {
+                    case 'aprovada':
+                        statusColor = 'bg-green-500/20 text-green-300'; statusText = 'Aprovada'; break;
+                    case 'Recusada Gestão':
+                        statusColor = 'bg-red-500/20 text-red-300'; statusText = 'Recusada'; break;
+                    default:
+                        statusColor = 'bg-yellow-500/20 text-yellow-300'; statusText = 'Pendente'; break;
                 }
                 return `
-                <tr class="border-b text-sm hover:bg-gray-50">
-                    <td class="p-2">${c.id_parceiro}</td>
-                    <td class="p-2"><a href="#" class="view-comissao-details-btn text-blue-600 hover:underline" data-comissao-id="${c.id}">${c.id_venda || 'N/A'}</a></td>
-                    <td class="p-2">${formatApiDateToBR(c.data_venda)}</td>
-                    <td class="p-2 text-right">${formatCurrency(c.valor_venda)}</td>
-                    <td class="p-2" title="${c.justificativa}">${(c.justificativa || '').substring(0, 30)}${c.justificativa && c.justificativa.length > 30 ? '...' : ''}</td>
-                    <td class="p-2">${c.consultor || ''}</td>
-                    <td class="p-2 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusColor}">${status}</span></td>
+                <tr>
+                    <td>${c.id_parceiro}</td>
+                    <td><a href="#" class="view-comissao-details-btn text-primary/80 hover:text-primary font-semibold" data-comissao-id="${c.id}">${c.id_venda || 'N/A'}</a></td>
+                    <td>${formatApiDateToBR(c.data_venda)}</td>
+                    <td class="text-right">${formatCurrency(c.valor_venda)}</td>
+                    <td title="${c.justificativa}">${(c.justificativa || '').substring(0, 30)}${c.justificativa && c.justificativa.length > 30 ? '...' : ''}</td>
+                    <td>${c.consultor || ''}</td>
+                    <td class="text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusColor}">${statusText}</span></td>
                 </tr>`;
             }).join('');
         }
     
         container.innerHTML = `
             <div class="max-h-[65vh] overflow-y-auto">
-                <table class="w-full">
+                <table>
                     <thead>
-                        <tr class="bg-gray-100 text-xs uppercase">
-                            <th class="p-2 text-left">ID Parceiro</th>
-                            <th class="p-2 text-left">ID Venda</th>
-                            <th class="p-2 text-left">Data</th>
-                            <th class="p-2 text-right">Valor</th>
-                            <th class="p-2 text-left">Justificativa</th>
-                            <th class="p-2 text-left">Consultor</th>
-                            <th class="p-2 text-center">Status</th>
+                        <tr>
+                            <th>ID Parceiro</th>
+                            <th>ID Venda</th>
+                            <th>Data</th>
+                            <th class="text-right">Valor</th>
+                            <th>Justificativa</th>
+                            <th>Consultor</th>
+                            <th class="text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody>${rowsHtml}</tbody>
@@ -367,7 +370,7 @@ class RelacionamentoApp {
         const container = document.getElementById('sysled-table-container');
         if (!container) return;
         if (this.sysledData.length === 0) {
-             container.innerHTML = `<div class="text-center text-gray-500 py-8"><p>Clique em "Atualizar Dados" para carregar as informações da API Sysled.</p></div>`; return;
+             container.innerHTML = `<div class="text-center text-gray-400 py-8"><p>Clique em "Atualizar" para carregar as informações da API Sysled.</p></div>`; return;
         }
         const dataInicio = document.getElementById('sysled-filter-data-inicio').value;
         const dataFim = document.getElementById('sysled-filter-data-fim').value;
@@ -402,34 +405,34 @@ class RelacionamentoApp {
         });
         this.sysledFilteredData = dataToRender;
         const headers = Object.keys(this.sysledData[0]);
-        const headerHtml = headers.map(h => `<th class="p-2 text-left text-xs uppercase bg-gray-100 sticky top-0 z-10">${h.replace(/_/g, ' ')}</th>`).join('');
-        const filterHtml = headers.map(h => `<th class="p-1 bg-gray-100 sticky top-8 z-10"><input type="text" class="sysled-column-filter w-full p-1 border rounded-md text-sm" placeholder="Filtrar..." data-column="${h}" value="${columnFilters[h] ? columnFilters[h].replace(/"/g, '&quot;') : ''}"></th>`).join('');
+        const headerHtml = headers.map(h => `<th>${h.replace(/_/g, ' ')}</th>`).join('');
+        const filterHtml = headers.map(h => `<th><input type="text" class="sysled-column-filter w-full p-1 border rounded-md text-sm bg-background-dark/50 border-white/10" placeholder="Filtrar..." data-column="${h}" value="${columnFilters[h] ? columnFilters[h].replace(/"/g, '&quot;') : ''}"></th>`).join('');
         const rowsHtml = this.sysledFilteredData.length === 0
-            ? `<tr><td colspan="${headers.length}" class="text-center text-gray-500 py-8">Nenhum resultado encontrado.</td></tr>`
-            : this.sysledFilteredData.map(row => `<tr class="border-b text-sm hover:bg-gray-50">${headers.map(h => {
+            ? `<tr><td colspan="${headers.length}" class="text-center text-gray-400 py-8">Nenhum resultado encontrado.</td></tr>`
+            : this.sysledFilteredData.map(row => `<tr>${headers.map(h => {
                 let cellValue = row[h];
                 const lowerCaseHeader = h.toLowerCase();
                 if (lowerCaseHeader.includes('data')) cellValue = formatApiDateToBR(cellValue);
                 else if (lowerCaseHeader.includes('valor') || lowerCaseHeader.includes('total') || lowerCaseHeader.includes('valornota')) {
                     if (cellValue !== null && !isNaN(Number(String(cellValue)))) cellValue = formatApiNumberToBR(cellValue);
                 }
-                return `<td class="p-2">${cellValue ?? ''}</td>`;
+                return `<td>${cellValue ?? ''}</td>`;
             }).join('')}</tr>`).join('');
-        container.innerHTML = `<div class="max-h-[65vh] overflow-auto"><table class="w-full min-w-max"><thead><tr>${headerHtml}</tr><tr>${filterHtml}</tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
+        container.innerHTML = `<div class="max-h-[65vh] overflow-auto"><table><thead class="sticky top-0 z-10"><tr>${headerHtml}</tr><tr>${filterHtml}</tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
     }
 
     renderSalesHistoryModal(salesData, isApiData) {
         const container = document.getElementById('sales-history-table-container');
         if (!salesData || salesData.length === 0) {
-            container.innerHTML = `<p class="text-center text-gray-500 py-8">Nenhuma venda encontrada para este parceiro.</p>`; return;
+            container.innerHTML = `<p class="text-center text-gray-400 py-8">Nenhuma venda encontrada para este parceiro.</p>`; return;
         }
         const rowsHtml = salesData.map(sale => {
             const idCellContent = isApiData 
-                ? `<a href="#" class="view-sale-details-btn text-blue-600 hover:underline" data-pedido-id="${sale.id_pedido}">${sale.id_pedido}</a>`
+                ? `<a href="#" class="view-sale-details-btn text-primary/80 hover:text-primary" data-pedido-id="${sale.id_pedido}">${sale.id_pedido}</a>`
                 : sale.id_pedido;
-            return `<tr class="border-b text-sm"><td class="p-2">${idCellContent}</td><td class="p-2 text-right">${formatCurrency(sale.valor_nota)}</td><td class="p-2 text-center">${formatApiDateToBR(sale.data_finalizacao_prevenda)}</td></tr>`
+            return `<tr><td>${idCellContent}</td><td class="text-right">${formatCurrency(sale.valor_nota)}</td><td class="text-center">${formatApiDateToBR(sale.data_finalizacao_prevenda)}</td></tr>`
         }).join('');
-        container.innerHTML = `<table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID Pedido</th><th class="p-2 text-right">Valor da Nota</th><th class="p-2 text-center">Data da Venda</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+        container.innerHTML = `<table><thead><tr><th>ID Pedido</th><th class="text-right">Valor da Nota</th><th class="text-center">Data da Venda</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
     }
     
     // NOVO: Renderiza a tabela de logs de eventos
@@ -438,28 +441,28 @@ class RelacionamentoApp {
         if (!container) return;
 
         if (this.actionLogs.length === 0) {
-            container.innerHTML = `<p class="text-center text-gray-500 py-8">Nenhum evento registrado.</p>`;
+            container.innerHTML = `<p class="text-center text-gray-400 py-8">Nenhum evento registrado.</p>`;
             return;
         }
 
         const rowsHtml = this.actionLogs.map(log => {
             const timestamp = new Date(log.when_did).toLocaleString('pt-BR');
             return `
-                <tr class="border-b text-sm">
-                    <td class="p-2">${log.who_did}</td>
-                    <td class="p-2">${log.what_did}</td>
-                    <td class="p-2">${timestamp}</td>
+                <tr>
+                    <td>${log.who_did}</td>
+                    <td>${log.what_did}</td>
+                    <td>${timestamp}</td>
                 </tr>
             `;
         }).join('');
 
         container.innerHTML = `
-            <table class="w-full">
+            <table>
                 <thead>
-                    <tr class="bg-gray-100 text-xs uppercase">
-                        <th class="p-2 text-left">Usuário</th>
-                        <th class="p-2 text-left">Ação</th>
-                        <th class="p-2 text-left">Quando</th>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Ação</th>
+                        <th>Quando</th>
                     </tr>
                 </thead>
                 <tbody>${rowsHtml}</tbody>
@@ -472,7 +475,7 @@ class RelacionamentoApp {
         if (!btn) return;
         const isEnabled = this.schemaHasRtAcumulado && this.schemaHasRtTotalPago;
         btn.disabled = !isEnabled;
-        btn.title = isEnabled ? "" : "Funcionalidade desabilitada. Crie as colunas 'rt_acumulado' e 'rt_total_pago' no banco de dados.";
+        btn.title = isEnabled ? "Gerar pagamentos para arquitetos elegíveis" : "Funcionalidade desabilitada. Crie as colunas 'rt_acumulado' e 'rt_total_pago' no banco de dados.";
         btn.classList.toggle('opacity-50', !isEnabled);
         btn.classList.toggle('cursor-not-allowed', !isEnabled);
     }
@@ -486,8 +489,8 @@ class RelacionamentoApp {
         const fields = { id_prevenda: 'ID Prevenda', data_venda: 'Data Venda', nome_cliente: 'Nome Cliente', valor_venda: 'Valor Venda', executivo: 'Executivo', id_parceiro: 'ID Parceiro', parceiro: 'Parceiro', loja: 'Loja' };
         const autoMap = { id_prevenda: 'idPedido', data_venda: 'dataFinalizacaoPrevenda', nome_cliente: 'clienteFantasia', valor_venda: 'valorNota', executivo: 'consultor', id_parceiro: 'idParceiro', parceiro: 'parceiro', loja: 'idEmpresa' };
         for (const key in fields) {
-            const options = headers.map(h => `<option value="${h}">${h}</option>`).join('');
-            form.innerHTML += `<div class="grid grid-cols-2 gap-4 items-center"><label for="map-${key}" class="font-medium text-gray-700">${fields[key]}</label><select id="map-${key}" name="${key}" class="w-full p-2 bg-gray-50 border rounded-lg"><option value="">Selecione...</option>${options}</select></div>`;
+            const options = headers.map(h => `<option value="${h}" class="bg-background-dark">${h}</option>`).join('');
+            form.innerHTML += `<div class="grid grid-cols-2 gap-4 items-center"><label for="map-${key}" class="font-medium text-gray-300">${fields[key]}</label><select id="map-${key}" name="${key}" class="glass-input w-full p-2 rounded-lg"><option value="" class="bg-background-dark">Selecione...</option>${options}</select></div>`;
             if (this.isSysledImport) {
                 const select = form.querySelector(`#map-${key}`);
                 if (select && headers.includes(autoMap[key])) select.value = autoMap[key];
@@ -496,53 +499,48 @@ class RelacionamentoApp {
         modal.onclick = (e) => {
             if (e.target === modal) this.closeRtMappingModal();
         };
-        modal.classList.add('flex');
+        modal.classList.add('active');
     }
 
     closeRtMappingModal() {
-        const modal = document.getElementById('rt-mapping-modal');
-        modal.classList.remove('flex');
-        modal.onclick = null;
+        document.getElementById('rt-mapping-modal').classList.remove('active');
         const fileInput = document.getElementById('rt-file-input');
         if (fileInput) fileInput.value = '';
-        const fileName = document.getElementById('rt-file-name');
-        if (fileName) fileName.textContent = '';
+        document.getElementById('rt-file-name').textContent = '';
     }
 
     openArquitetoMappingModal(headers) {
         const form = document.getElementById('arquiteto-mapping-form');
         const modal = document.getElementById('arquiteto-mapping-modal');
         form.innerHTML = '';
-        const fields = { id: 'ID', nome: 'Nome', email: 'Email', telefone: 'Telefone', chave_pix: 'Chave PIX' };
+        const fields = { id: 'ID', nome: 'Nome', email: 'Email', telefone: 'Telefone', chave_pix: 'Chave PIX', tipo_chave_pix: 'Tipo Chave PIX' };
         for (const key in fields) {
-            const options = headers.map(h => `<option value="${h}">${h}</option>`).join('');
-            form.innerHTML += `<div class="grid grid-cols-2 gap-4 items-center"><label class="font-medium text-gray-700">${fields[key]}</label><select name="${key}" class="w-full p-2 bg-gray-50 border rounded-lg"><option value="">Selecione...</option>${options}</select></div>`;
+            const options = headers.map(h => `<option value="${h}" class="bg-background-dark">${h}</option>`).join('');
+            form.innerHTML += `<div class="grid grid-cols-2 gap-4 items-center"><label class="font-medium text-gray-300">${fields[key]}</label><select name="${key}" class="glass-input w-full p-2 rounded-lg"><option value="" class="bg-background-dark">Selecione...</option>${options}</select></div>`;
         }
         modal.onclick = (e) => {
             if (e.target === modal) this.closeArquitetoMappingModal();
         };
-        modal.classList.add('flex');
+        modal.classList.add('active');
     }
 
     closeArquitetoMappingModal() {
-        const modal = document.getElementById('arquiteto-mapping-modal');
-        modal.classList.remove('flex');
-        modal.onclick = null;
+        document.getElementById('arquiteto-mapping-modal').classList.remove('active');
         const fileInput = document.getElementById('arquiteto-file-input');
         if (fileInput) fileInput.value = '';
-        const fileName = document.getElementById('file-name-arquitetos');
-        if (fileName) fileName.textContent = '';
+        document.getElementById('file-name-arquitetos').textContent = '';
     }
 
     openEditModal(id) {
-        const arquiteto = this.arquitetos.find(a => a.id === id);
+        const arquiteto = this.arquitetos.find(a => String(a.id) === String(id));
         if (!arquiteto) return;
         document.getElementById('edit-arquiteto-original-id').value = arquiteto.id;
-        document.getElementById('edit-arquiteto-id').textContent = arquiteto.id;
-        document.getElementById('edit-arquiteto-nome').value = arquiteto.nome;
-        document.getElementById('edit-arquiteto-email').value = arquiteto.email;
-        document.getElementById('edit-arquiteto-telefone').value = arquiteto.telefone;
-        document.getElementById('edit-arquiteto-pix').value = arquiteto.pix;
+        document.getElementById('edit-arquiteto-id').textContent = `ID: ${arquiteto.id}`;
+        document.getElementById('edit-arquiteto-nome').value = arquiteto.nome || '';
+        document.getElementById('edit-arquiteto-email').value = arquiteto.email || '';
+        document.getElementById('edit-arquiteto-telefone').value = arquiteto.telefone || '';
+        document.getElementById('edit-arquiteto-pix').value = arquiteto.pix || '';
+        document.getElementById('edit-arquiteto-tipo-pix').value = arquiteto.tipo_chave_pix || '';
         document.getElementById('edit-arquiteto-vendas').value = arquiteto.salesCount || 0;
         document.getElementById('rt-valor-vendas').textContent = formatCurrency(arquiteto.valorVendasTotal || 0);
         document.getElementById('rt-percentual').value = arquiteto.rtPercentual || 0.05;
@@ -552,14 +550,12 @@ class RelacionamentoApp {
         modal.onclick = (e) => {
             if (e.target === modal) this.closeEditModal();
         };
-        modal.classList.add('flex');
+        modal.classList.add('active');
         this.calculateRT();
     }
 
     closeEditModal() {
-        const modal = document.getElementById('edit-arquiteto-modal');
-        modal.classList.remove('flex');
-        modal.onclick = null;
+        document.getElementById('edit-arquiteto-modal').classList.remove('active');
     }
     
     openAddValueModal(id) {
@@ -571,13 +567,12 @@ class RelacionamentoApp {
         modal.onclick = (e) => {
             if (e.target === modal) this.closeAddValueModal();
         };
-        modal.classList.add('flex');
+        modal.classList.add('active');
     }
 
     closeAddValueModal() {
         const modal = document.getElementById('add-value-modal');
-        modal.classList.remove('flex');
-        modal.onclick = null;
+        modal.classList.remove('active');
         document.getElementById('add-value-form').reset();
     }
     
@@ -595,37 +590,33 @@ class RelacionamentoApp {
         document.getElementById('comprovante-valor-rt').textContent = formatCurrency(pagamento.rt_valor || 0);
         const imgContainer = document.getElementById('comprovante-img-container');
         imgContainer.innerHTML = (pagamento.comprovante && pagamento.comprovante.url)
-            ? `<img src="${pagamento.comprovante.url}" alt="${pagamento.comprovante.name}" class="max-w-full max-h-96 object-contain">`
-            : `<p class="text-gray-500">Nenhum comprovante anexado.</p>`;
+            ? `<img src="${pagamento.comprovante.url}" alt="${pagamento.comprovante.name}" class="max-w-full max-h-96 object-contain rounded-lg">`
+            : `<p class="text-gray-400">Nenhum comprovante anexado.</p>`;
         const modal = document.getElementById('comprovante-modal');
         modal.onclick = (e) => {
             if (e.target === modal) this.closeComprovanteModal();
         };
-        modal.classList.add('flex');
+        modal.classList.add('active');
     }
     
     closeComprovanteModal() {
-        const modal = document.getElementById('comprovante-modal');
-        modal.classList.remove('flex');
-        modal.onclick = null;
+        document.getElementById('comprovante-modal').classList.remove('active');
     }
 
     openGerarPagamentosModal() {
         const container = document.getElementById('gerar-pagamentos-table-container');
         const rowsHtml = this.eligibleForPayment.map(a => `
-            <tr class="border-b text-sm"><td class="p-2">${a.id}</td><td class="p-2">${a.nome}</td><td class="p-2 text-right font-semibold text-green-600">${formatCurrency(a.rt_acumulado || 0)}</td><td class="p-2">${a.pix || 'Não cadastrado'}</td></tr>`).join('');
-        container.innerHTML = `<table class="w-full"><thead><tr class="bg-gray-100 text-xs uppercase"><th class="p-2 text-left">ID</th><th class="p-2 text-left">Nome</th><th class="p-2 text-right">Valor a Pagar</th><th class="p-2 text-left">Chave PIX</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+            <tr><td>${a.id}</td><td>${a.nome}</td><td class="text-right font-semibold text-primary">${formatCurrency(a.rt_acumulado || 0)}</td><td>${(a.tipo_chave_pix ? a.tipo_chave_pix + ': ' : '') + (a.pix || 'Não cadastrado')}</td></tr>`).join('');
+        container.innerHTML = `<table><thead><tr><th>ID</th><th>Nome</th><th class="text-right">Valor a Pagar</th><th>Chave PIX</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
         const modal = document.getElementById('gerar-pagamentos-modal');
         modal.onclick = (e) => {
             if (e.target === modal) this.closeGerarPagamentosModal();
         };
-        modal.classList.add('flex');
+        modal.classList.add('active');
     }
 
     closeGerarPagamentosModal() {
-        const modal = document.getElementById('gerar-pagamentos-modal');
-        modal.classList.remove('flex');
-        modal.onclick = null;
+        document.getElementById('gerar-pagamentos-modal').classList.remove('active');
     }
 
     openSaleDetailsModal(pedidoId) {
@@ -634,24 +625,20 @@ class RelacionamentoApp {
         if (!saleData) { alert(`Detalhes para o pedido ${pedidoId} não foram encontrados.`); return; }
         document.getElementById('sale-details-modal-title').textContent = `Detalhes da Venda - Pedido ${pedidoId}`;
         document.getElementById('import-single-sale-btn').dataset.pedidoId = pedidoId;
-        const detailsHtml = Object.entries(saleData).map(([key, value]) => `<tr class="border-b"><td class="p-2 font-semibold text-gray-600 align-top">${key}</td><td class="p-2 text-gray-800">${value ?? ''}</td></tr>`).join('');
+        const detailsHtml = Object.entries(saleData).map(([key, value]) => `<tr><td class="p-2 font-semibold text-gray-300 align-top">${key}</td><td class="p-2 text-gray-100">${value ?? ''}</td></tr>`).join('');
         document.getElementById('sale-details-content').innerHTML = `<table class="w-full text-sm"><tbody>${detailsHtml}</tbody></table>`;
         const modal = document.getElementById('sale-details-modal');
         modal.onclick = (e) => {
             if (e.target === modal) this.closeSaleDetailsModal();
         };
-        modal.classList.add('flex');
+        modal.classList.add('active');
     }
 
     closeSaleDetailsModal() {
-        const modal = document.getElementById('sale-details-modal');
-        modal.classList.remove('flex');
-        modal.onclick = null;
+        document.getElementById('sale-details-modal').classList.remove('active');
     }
     closeSalesHistoryModal() {
-        const modal = document.getElementById('sales-history-modal');
-        modal.classList.remove('flex');
-        modal.onclick = null;
+        document.getElementById('sales-history-modal').classList.remove('active');
     }
 
     openComissaoManualDetailsModal(comissaoId) {
@@ -662,11 +649,11 @@ class RelacionamentoApp {
 
         let statusColor;
         if (status === 'aprovada') {
-            statusColor = 'bg-green-100 text-green-800';
+            statusColor = 'bg-green-500/20 text-green-300';
         } else if (status === 'Recusada Gestão') {
-            statusColor = 'bg-red-100 text-red-800';
+            statusColor = 'bg-red-500/20 text-red-300';
         } else {
-            statusColor = 'bg-yellow-100 text-yellow-800';
+            statusColor = 'bg-yellow-500/20 text-yellow-300';
         }
 
         const content = [
@@ -678,7 +665,7 @@ class RelacionamentoApp {
             { label: 'Consultor', value: comissao.consultor || 'N/A' },
             { label: 'Justificativa', value: comissao.justificativa, pre: true },
             { label: 'Status', value: `<span class="px-2 py-1 text-xs font-semibold rounded-full ${statusColor}">${status}</span>` }
-        ].map(item => `<div class="grid grid-cols-3 gap-2"><p class="font-semibold text-gray-600 col-span-1">${item.label}:</p><div class="col-span-2 ${item.pre ? 'whitespace-pre-wrap' : ''}">${item.value}</div></div>`).join('');
+        ].map(item => `<div class="grid grid-cols-3 gap-2"><p class="font-medium text-gray-400 col-span-1">${item.label}:</p><div class="col-span-2 ${item.pre ? 'whitespace-pre-wrap' : ''}">${item.value}</div></div>`).join('');
         document.getElementById('comissao-manual-details-content').innerHTML = content;
         
         const approveBtn = document.getElementById('aprovar-inclusao-manual-btn');
@@ -689,13 +676,11 @@ class RelacionamentoApp {
         modal.onclick = (e) => {
             if (e.target === modal) this.closeComissaoManualDetailsModal();
         };
-        modal.classList.add('flex');
+        modal.classList.add('active');
     }
 
     closeComissaoManualDetailsModal() {
-        const modal = document.getElementById('comissao-manual-details-modal');
-        modal.classList.remove('flex');
-        modal.onclick = null;
+        document.getElementById('comissao-manual-details-modal').classList.remove('active');
     }
 
     openEditRtModal(pagamentoId, type = 'pagamento') {
@@ -715,13 +700,12 @@ class RelacionamentoApp {
         modal.onclick = (e) => {
             if (e.target === modal) this.closeEditRtModal();
         };
-        modal.classList.add('flex');
+        modal.classList.add('active');
     }
 
     closeEditRtModal() {
         const modal = document.getElementById('edit-rt-modal');
-        modal.classList.remove('flex');
-        modal.onclick = null;
+        modal.classList.remove('active');
         document.getElementById('edit-rt-form').reset();
     }
     
@@ -915,9 +899,10 @@ class RelacionamentoApp {
             const arquitetoData = {
                 id: id,
                 nome: row[mapping.nome],
-                email: row[mapping.email] || '',
-                telefone: row[mapping.telefone] || '',
-                pix: row[mapping.chave_pix] || ''
+                email: row[mapping.email] || null,
+                telefone: row[mapping.telefone] || null,
+                pix: row[mapping.chave_pix] || null,
+                tipo_chave_pix: row[mapping.tipo_chave_pix] || null
             };
 
             const arquitetoExistente = this.arquitetos.find(a => a.id === id);
@@ -955,7 +940,8 @@ class RelacionamentoApp {
                         nome: arq.nome,
                         email: arq.email,
                         telefone: arq.telefone,
-                        pix: arq.pix
+                        pix: arq.pix,
+                        tipo_chave_pix: arq.tipo_chave_pix
                     }).eq('id', arq.id)
                 );
                 const results = await Promise.all(updatePromises);
@@ -993,12 +979,18 @@ class RelacionamentoApp {
         const originalId = document.getElementById('edit-arquiteto-original-id').value;
         const arquiteto = this.arquitetos.find(a => a.id === originalId);
         if (!arquiteto) return;
+        
+        const tipoPixValue = document.getElementById('edit-arquiteto-tipo-pix').value;
         const updatedData = {
-            nome: document.getElementById('edit-arquiteto-nome').value, email: document.getElementById('edit-arquiteto-email').value,
-            telefone: document.getElementById('edit-arquiteto-telefone').value, pix: document.getElementById('edit-arquiteto-pix').value,
+            nome: document.getElementById('edit-arquiteto-nome').value,
+            email: document.getElementById('edit-arquiteto-email').value,
+            telefone: document.getElementById('edit-arquiteto-telefone').value,
+            pix: document.getElementById('edit-arquiteto-pix').value,
+            tipo_chave_pix: tipoPixValue || null,
             salesCount: parseInt(document.getElementById('edit-arquiteto-vendas').value, 10) || 0,
             rtPercentual: parseFloat(document.getElementById('rt-percentual').value)
         };
+
         if (this.schemaHasRtAcumulado && updatedData.rtPercentual !== arquiteto.rtPercentual) {
             updatedData.rt_acumulado = (arquiteto.valorVendasTotal || 0) * updatedData.rtPercentual - (arquiteto.rt_total_pago || 0);
         }
@@ -1050,7 +1042,7 @@ class RelacionamentoApp {
     exportArquitetosCSV() {
         if (this.arquitetos.length === 0) { alert("Não há dados para exportar."); return; }
         const data = this.arquitetos.map(a => {
-            const row = { id: a.id, nome: a.nome, email: a.email, telefone: a.telefone, pix: a.pix, quantidade_vendas: a.salesCount || 0, valor_total_vendas: a.valorVendasTotal || 0, pontos: this.pontuacoes[a.id] || 0 };
+            const row = { id: a.id, nome: a.nome, email: a.email, telefone: a.telefone, tipo_chave_pix: a.tipo_chave_pix, pix: a.pix, quantidade_vendas: a.salesCount || 0, valor_total_vendas: a.valorVendasTotal || 0, pontos: this.pontuacoes[a.id] || 0 };
             if (this.schemaHasRtAcumulado) row.rt_acumulado = a.rt_acumulado || 0;
             if (this.schemaHasRtTotalPago) row.rt_total_pago = a.rt_total_pago || 0;
             return row;
@@ -1122,7 +1114,7 @@ class RelacionamentoApp {
             const statusSpan = target.parentElement.querySelector('.file-status-text');
             if (target.files.length > 0 && statusSpan) {
                 statusSpan.textContent = 'Comprovante anexado';
-                statusSpan.className = 'file-status-text text-xs text-green-600 font-semibold';
+                statusSpan.className = 'file-status-text text-xs text-green-400 font-semibold';
             }
             this.handleComprovanteUpload(id, target.files[0], type);
         }
@@ -1261,9 +1253,9 @@ class RelacionamentoApp {
         const total = data.reduce((sum, p) => sum + parseCurrency(p.rt_valor || 0), 0);
         const rows = data.sort((a, b) => a.parceiro.localeCompare(b.parceiro)).map(p => {
             const arquiteto = this.arquitetos.find(arq => arq.id === p.id_parceiro);
-            const chavePix = arquiteto ? arquiteto.pix || 'Não cadastrada' : 'Não encontrado';
+            const chavePix = arquiteto ? `${arquiteto.tipo_chave_pix || ''} ${arquiteto.pix || 'Não cadastrada'}`.trim() : 'Não encontrado';
             return `
-            <tr class="border-b text-sm">
+            <tr class="border-b">
                 <td class="p-2">${p.id_parceiro}</td>
                 <td class="p-2">${p.parceiro}</td>
                 <td class="p-2">${chavePix}</td>
@@ -1272,10 +1264,10 @@ class RelacionamentoApp {
             </tr>`;
         }).join('');
         const content = `<div class="report-section">
-          <h2 class="text-xl font-bold mb-4">Relatório de Pagamento - ${date}</h2>
-          <table class="w-full">
+          <h2 class="text-2xl font-bold mb-6">Relatório de Pagamento - ${date}</h2>
+          <table class="w-full text-sm">
             <thead>
-              <tr class="bg-gray-100 text-xs uppercase">
+              <tr class="border-b-2 border-gray-300">
                 <th class="p-2 text-left">ID</th>
                 <th class="p-2 text-left">Parceiro</th>
                 <th class="p-2 text-left">Chave Pix</th>
@@ -1286,7 +1278,7 @@ class RelacionamentoApp {
             <tbody>${rows}</tbody>
           </table>
         </div>`;
-        const template = `<html><head><title>Relatório - ${date}</title><script src="https://cdn.tailwindcss.com"><\/script><style>@media print{.no-print{display: none;}}</style></head><body class="p-8 bg-gray-100"><div class="no-print text-center mb-8"><button onclick="window.print()" class="bg-blue-600 text-white py-2 px-6 rounded">Imprimir</button></div><div class="max-w-5xl mx-auto bg-white p-8 rounded shadow">${content}<div class="mt-8 text-right"><h3 class="text-xl font-bold">Soma Total (RT) a Pagar</h3><p class="text-3xl font-bold mt-1 text-emerald-600">${formatCurrency(total)}</p></div></div></body></html>`;
+        const template = `<html><head><title>Relatório - ${date}</title><script src="https://cdn.tailwindcss.com"><\/script><style>@media print{.no-print{display: none;}} body { font-family: sans-serif; }</style></head><body class="p-8 bg-gray-100"><div class="no-print text-center mb-8"><button onclick="window.print()" class="bg-blue-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition">Imprimir</button></div><div class="max-w-5xl mx-auto bg-white p-12 rounded-xl shadow-2xl">${content}<div class="mt-12 text-right border-t-2 pt-6"><h3 class="text-xl font-bold text-gray-700">Soma Total (RT) a Pagar</h3><p class="text-4xl font-bold mt-2 text-green-600">${formatCurrency(total)}</p></div></div></body></html>`;
         const win = window.open('', '_blank');
         win.document.write(template);
         win.document.close();
@@ -1497,7 +1489,7 @@ class RelacionamentoApp {
     
     async fetchSysledData() {
         const container = document.getElementById('sysled-table-container');
-        container.innerHTML = `<p class="text-center text-gray-500 py-8">Buscando dados... <i class="fas fa-spinner fa-spin"></i></p>`;
+        container.innerHTML = `<p class="text-center text-gray-400 py-8">Buscando dados... <span class="material-symbols-outlined animate-spin align-middle">progress_activity</span></p>`;
         try {
             const response = await fetch('https://integration.sysled.com.br/n8n/api/?v_crm_oportunidades_propostas_up180dd=null', { headers: { 'Authorization': 'e4b6f9082f1b8a1f37ad5b56e637f3ec719ec8f0b6acdd093972f9c5bb29b9ed' } });
             if (!response.ok) throw new Error(`Erro na API: ${response.statusText}`);
@@ -1505,7 +1497,7 @@ class RelacionamentoApp {
             await this.logAction("Atualizou os dados da consulta Sysled.");
         } catch (error) {
             console.error("Erro na API Sysled:", error);
-            container.innerHTML = `<p class="text-center text-red-500 py-8">Erro ao carregar dados da API.</p>`;
+            container.innerHTML = `<p class="text-center text-red-400 py-8">Erro ao carregar dados da API.</p>`;
         } finally {
             this.renderSysledTable();
         }
@@ -1595,18 +1587,18 @@ class RelacionamentoApp {
         const arq = this.arquitetos.find(a => a.id === id);
         document.getElementById('sales-history-modal-title').textContent = `Histórico de Vendas para ${arq ? arq.nome : id}`;
         const container = document.getElementById('sales-history-table-container');
-        container.innerHTML = `<p class="text-center text-gray-500 py-8">Consultando... <i class="fas fa-spinner fa-spin"></i></p>`;
+        container.innerHTML = `<p class="text-center text-gray-400 py-8">Consultando... <span class="material-symbols-outlined animate-spin align-middle">progress_activity</span></p>`;
         const modal = document.getElementById('sales-history-modal');
         modal.onclick = (e) => {
             if (e.target === modal) this.closeSalesHistoryModal();
         };
-        modal.classList.add('flex');
+        modal.classList.add('active');
         try {
             const { data, error } = await supabase.from('sysled_imports').select('id_pedido, valor_nota, data_finalizacao_prevenda').eq('id_parceiro', id).order('data_finalizacao_prevenda', { ascending: false });
             if (error) throw error;
-            this.renderSalesHistoryModal(data, false);
+            this.renderSalesHistoryModal(data, true); // true indica que são dados da API e podem ter detalhes
         } catch (error) {
-            container.innerHTML = `<p class="text-center text-red-500 py-8">Erro ao consultar vendas.</p>`;
+            container.innerHTML = `<p class="text-center text-red-400 py-8">Erro ao consultar vendas.</p>`;
         }
     }
 
@@ -1845,5 +1837,3 @@ class RelacionamentoApp {
 }
 
 export default RelacionamentoApp;
-
-
