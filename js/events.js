@@ -77,10 +77,13 @@ export function initializeEventListeners(app) {
         if (target.closest('#import-single-sale-btn')) app.handleImportSingleSale(e);
         if (target.closest('#close-sale-details-btn')) app.closeSaleDetailsModal();
         
-        // Ações da aba Inclusão Manual e Modais relacionados
-        if (target.closest('.view-comissao-details-btn')) { e.preventDefault(); app.handleHistoricoManualClick(e); }
-        if (target.closest('#close-comissao-manual-details-btn')) app.closeComissaoManualDetailsModal();
-        if (target.closest('#aprovar-inclusao-manual-btn')) app.handleAprovarInclusaoManual(e);
+        // Ações da aba Inclusão Manual e Modais relacionados
+        if (target.closest('.view-comissao-details-btn')) { e.preventDefault(); app.handleHistoricoManualClick(e); }
+        if (target.closest('#close-comissao-manual-details-btn')) app.closeComissaoManualDetailsModal();
+        if (target.closest('#aprovar-inclusao-manual-btn')) app.handleAprovarInclusaoManual(e);
+        
+        // Ações do Modal de Novo Arquiteto
+        if (target.closest('#cancel-novo-arquiteto-btn')) app.cancelNovoArquiteto();
 
         // Ações da aba Eventos
         if (target.closest('#clear-events-log-btn')) app.clearEventsLog();
@@ -89,14 +92,15 @@ export function initializeEventListeners(app) {
     // --- DELEGAÇÃO DE EVENTOS DE SUBMISSÃO (FORMULÁRIOS) ---
     mainContainer.addEventListener('submit', (e) => {
         e.preventDefault(); // Impede o comportamento padrão de todos os formulários
-        switch (e.target.id) {
-            case 'add-comissao-manual-form': app.handleAddComissaoManual(e); break;
-            case 'add-arquiteto-form': app.handleAddArquiteto(e); break;
-            case 'edit-arquiteto-form': app.handleEditArquiteto(e); break;
-            case 'add-value-form': app.handleAddValue(e); break;
-            case 'add-pontos-form': app.handleAddPontos(e); break;
-            case 'edit-rt-form': app.handleUpdateRtValue(e); break;
-        }
+        switch (e.target.id) {
+            case 'add-comissao-manual-form': app.handleAddComissaoManual(e); break;
+            case 'add-arquiteto-form': app.handleAddArquiteto(e); break;
+            case 'edit-arquiteto-form': app.handleEditArquiteto(e); break;
+            case 'add-value-form': app.handleAddValue(e); break;
+            case 'add-pontos-form': app.handleAddPontos(e); break;
+            case 'edit-rt-form': app.handleUpdateRtValue(e); break;
+            case 'novo-arquiteto-form': app.handleNovoArquitetoSubmit(e); break;
+        }
     });
     
     // --- DELEGAÇÃO DE EVENTOS DE INPUT E CHANGE ---

@@ -26,6 +26,7 @@ class RelacionamentoApp {
         this.sysledData = [];
         this.sysledFilteredData = [];
         this.isSysledImport = false;
+        this.pendingImportData = null; // Para armazenar dados de importação pendentes
         
         // Estado de ordenação da tabela de arquitetos
         this.sortColumn = 'nome';
@@ -1551,6 +1552,14 @@ class RelacionamentoApp {
             return newRow;
         });
     
+        // Verificar se existem arquitetos não cadastrados
+        const arquitetosNaoCadastrados = await this.verificarArquitetosNaoCadastrados(processedData);
+        if (arquitetosNaoCadastrados.length > 0) {
+            this.pendingImportData = processedData;
+            this.showNovoArquitetoModal(arquitetosNaoCadastrados[0]);
+            return;
+        }
+    
         let dataToProcess = processedData;
     
         const pedidoIds = processedData.map(row => row.id_prevenda).filter(id => id);
@@ -1832,6 +1841,146 @@ class RelacionamentoApp {
                 await this.loadData(); // Recarrega os dados (agora vazios)
                 this.renderEventosLog(); // Re-renderiza a tabela
             }
+        }
+    }
+
+    // Função para verificar arquitetos não cadastrados
+    async verificarArquitetosNaoCadastrados(processedData) {
+        const arquitetosIds = [...new Set(processedData.map(row => String(row.id_parceiro)))];
+        const arquitetosNaoCadastrados = [];
+        
+        for (const id of arquitetosIds) {
+            const arquiteto = this.arquitetos.find(a => a.id === id);
+            if (!arquiteto) {
+                const vendaExemplo = processedData.find(row => String(row.id_parceiro) === id);
+                arquitetosNaoCadastrados.push({
+                    id: id,
+                    nome: vendaExemplo.parceiro || 'Novo Parceiro'
+                });
+            }
+        }
+        
+        return arquitetosNaoCadastrados;
+    }
+
+    // Mostra o modal de cadastro de novo arquiteto
+    showNovoArquitetoModal(arquiteto) {
+        document.getElementById('novo-arquiteto-id').value = arquiteto.id;
+        document.getElementById('novo-arquiteto-nome').value = arquiteto.nome;
+        document.getElementById('novo-arquiteto-id-display').value = arquiteto.id;
+        document.getElementById('novo-arquiteto-nome-display').value = arquiteto.nome;
+        
+        // Limpar campos
+        document.getElementById('novo-arquiteto-email').value = '';
+        document.getElementById('novo-arquiteto-tipo-pix').value = '';
+        document.getElementById('novo-arquiteto-pix').value = '';
+        document.getElementById('novo-arquiteto-telefone').value = '';
+        
+        const modal = document.getElementById('novo-arquiteto-modal');
+        modal.onclick = (e) => {
+            if (e.target === modal) this.cancelNovoArquiteto();
+        };
+        modal.classList.add('active');
+    }
+
+    // Cancela o cadastro de novo arquiteto
+    cancelNovoArquiteto() {
+        document.getElementById('novo-arquiteto-modal').classList.remove('active');
+        this.isSysledImport = false;
+        this.pendingImportData = null;
+    }
+
+    // Processa o cadastro de novo arquiteto
+    async handleNovoArquitetoSubmit(e) {
+        e.preventDefault();
+        
+        const id = document.getElementById('novo-arquiteto-id').value;
+        const nome = document.getElementById('novo-arquiteto-nome').value;
+        const email = document.getElementById('novo-arquiteto-email').value;
+        const tipoPix = document.getElementById('novo-arquiteto-tipo-pix').value;
+        const pix = document.getElementById('novo-arquiteto-pix').value;
+        const telefone = document.getElementById('novo-arquiteto-telefone').value;
+        
+        if (!email || !pix) {
+            alert('E-mail e Chave PIX são obrigatórios.');
+            return;
+        }
+        
+        try {
+            const novoArquitetoData = {
+                id: id,
+                nome: nome,
+                email: email,
+                telefone: telefone,
+                tipo_chave_pix: tipoPix,
+                pix: pix,
+                salesCount: 0,
+                valorVendasTotal: 0,
+                pontos: 0,
+                rtPercentual: 0.05,
+                rt_acumulado: 0,
+                rt_total_pago: 0
+            };
+            
+            const { data: created, error } = await supabase.from('arquitetos').insert(novoArquitetoData).select().single();
+            
+            if (error) {
+                alert('Erro ao cadastrar arquiteto: ' + error.message);
+                return;
+            }
+            
+            // Adicionar à lista local
+            this.arquitetos.push(created);
+            this.pontuacoes[id] = 0;
+            
+            await this.logAction(`Cadastrou novo arquiteto: ${nome} (ID: ${id})`);
+            
+            // Fechar modal
+            document.getElementById('novo-arquiteto-modal').classList.remove('active');
+            
+            // Continuar com a importação
+            if (this.pendingImportData) {
+                await this.continuarImportacao();
+            }
+            
+        } catch (error) {
+            alert('Erro ao cadastrar arquiteto: ' + error.message);
+        }
+    }
+
+    // Continua a importação após cadastrar o arquiteto
+    async continuarImportacao() {
+        if (!this.pendingImportData) return;
+        
+        const dataToProcess = this.pendingImportData;
+        this.pendingImportData = null;
+        
+        const pedidoIds = dataToProcess.map(row => row.id_prevenda).filter(id => id);
+        if (pedidoIds.length > 0) {
+            const { data: existing, error } = await supabase.from('sysled_imports').select('id_pedido').in('id_pedido', pedidoIds);
+    
+            if (error) {
+                alert('Erro ao verificar vendas existentes: ' + error.message);
+                this.isSysledImport = false;
+                return;
+            }
+    
+            const existingIds = new Set(existing.map(item => String(item.id_pedido)));
+            const alreadyImported = dataToProcess.filter(row => existingIds.has(String(row.id_prevenda)));
+            const newDataToProcess = dataToProcess.filter(row => !existingIds.has(String(row.id_prevenda)));
+    
+            if (alreadyImported.length > 0) {
+                alert(`Venda(s) já importada(s) e ignorada(s): ${alreadyImported.map(r => r.id_prevenda).join(', ')}`);
+            }
+            
+            if (newDataToProcess.length > 0) {
+                await this.processRTData(newDataToProcess);
+            } else {
+                alert("Nenhuma venda nova para importar. Todas as vendas filtradas já foram processadas anteriormente.");
+                this.isSysledImport = false;
+            }
+        } else {
+            await this.processRTData(dataToProcess);
         }
     }
 }
