@@ -1,3 +1,10 @@
+"""Módulo de inicialização para carregar variáveis de ambiente.
+
+Este script utiliza a biblioteca `python-dotenv` para carregar as variáveis
+de ambiente definidas em um arquivo `.env` para o escopo da aplicação.
+Ele verifica se todas as variáveis essenciais foram carregadas e
+imprime uma mensagem de status.
+"""
 import os
 from dotenv import load_dotenv
 

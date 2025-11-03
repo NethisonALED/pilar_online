@@ -10,7 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let appInstance = null; // Variável para guardar a instância da classe principal
 
-    // Monitora o estado da autenticação em tempo real
+    /**
+     * @description Monitora o estado da autenticação em tempo real.
+     * Se o usuário estiver logado, oculta a tela de login, exibe a aplicação e cria uma nova instância da classe principal.
+     * Se o usuário não estiver logado, exibe a tela de login e destrói a instância da aplicação para limpar o estado.
+     */
     supabase.auth.onAuthStateChange((event, session) => {
         if (session && session.user) {
             // Se o usuário está logado
@@ -30,7 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Event listener para o formulário de login
+    /**
+     * @description Manipula o evento de envio do formulário de login.
+     * Realiza a autenticação do usuário com o Supabase e exibe uma mensagem de erro, se houver.
+     */
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('email').value;
@@ -44,7 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Event listener para o botão de logout
+    /**
+     * @description Manipula o evento de clique no botão de logout.
+     * Realiza o logout do usuário com o Supabase e exibe uma mensagem de erro, se houver.
+     */
     logoutButton.addEventListener('click', async (e) => {
         e.preventDefault();
         const { error } = await supabase.auth.signOut();

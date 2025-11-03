@@ -3,6 +3,11 @@
  * Utiliza delegação de eventos no container principal para otimizar o desempenho.
  * @param {RelacionamentoApp} app - A instância principal da classe da aplicação.
  */
+/**
+ * @function initializeEventListeners
+ * @description Inicializa todos os event listeners da aplicação, utilizando delegação de eventos para otimizar o desempenho.
+ * @param {RelacionamentoApp} app - A instância principal da classe da aplicação.
+ */
 export function initializeEventListeners(app) {
     const mainContainer = document.getElementById('app-container');
     if (!mainContainer) {
@@ -10,7 +15,9 @@ export function initializeEventListeners(app) {
         return;
     }
 
-    // --- NAVEGAÇÃO POR ABAS ---
+    /**
+     * @description Navegação por abas: alterna a visibilidade das abas da aplicação.
+     */
     const menuLinks = document.querySelectorAll('.menu-link');
     const tabViews = document.querySelectorAll('.tab-view');
     menuLinks.forEach(link => {
@@ -24,7 +31,9 @@ export function initializeEventListeners(app) {
         });
     });
 
-    // --- DELEGAÇÃO DE EVENTOS DE CLIQUE ---
+    /**
+     * @description Delegação de eventos de clique: gerencia todas as ações de clique na aplicação.
+     */
     mainContainer.addEventListener('click', (e) => {
         const target = e.target;
 
@@ -89,7 +98,9 @@ export function initializeEventListeners(app) {
         if (target.closest('#clear-events-log-btn')) app.clearEventsLog();
     });
 
-    // --- DELEGAÇÃO DE EVENTOS DE SUBMISSÃO (FORMULÁRIOS) ---
+    /**
+     * @description Delegação de eventos de submissão: gerencia todos os envios de formulários.
+     */
     mainContainer.addEventListener('submit', (e) => {
         e.preventDefault(); // Impede o comportamento padrão de todos os formulários
         switch (e.target.id) {
@@ -103,7 +114,9 @@ export function initializeEventListeners(app) {
         }
     });
     
-    // --- DELEGAÇÃO DE EVENTOS DE INPUT E CHANGE ---
+    /**
+     * @description Delegação de eventos de input e change: gerencia as interações do usuário com os campos de formulário.
+     */
     mainContainer.addEventListener('input', (e) => {
         switch (e.target.id) {
             case 'arquiteto-search-input': app.renderArquitetosTable(); break;

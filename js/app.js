@@ -1,9 +1,18 @@
 import { supabase, parseCurrency, formatCurrency, fileToBase64, jsonToXLSXDataURL, formatApiDateToBR, formatApiNumberToBR, parseApiNumber } from './utils.js';
 import { initializeEventListeners } from './events.js';
+/**
+ * @class RelacionamentoApp
+ * @description Classe principal que gerencia o estado e a lógica da aplicação de relacionamento com arquitetos.
+ * Armazena dados de arquitetos, pagamentos, vendas e logs, além de controlar a renderização da interface.
+ */
 class RelacionamentoApp {
 
         
     
+    /**
+     * @constructor
+     * @description Inicializa o estado da aplicação, definindo arrays, objetos e flags que serão usados para armazenar os dados.
+     */
     constructor() {
         // Estado da aplicação
         this.arquitetos = [];
@@ -36,7 +45,10 @@ class RelacionamentoApp {
     }
 
     /**
-     * Inicializa a aplicação, carregando dados e configurando os event listeners.
+     * Inicializa a aplicação. Este método é chamado pelo construtor.
+     * @async
+     * @description Obtém a sessão do usuário, carrega todos os dados iniciais do Supabase,
+     * inicializa os event listeners e renderiza todos os componentes da UI.
      */
     async init() {
         const { data: { session } } = await supabase.auth.getSession();
@@ -49,7 +61,11 @@ class RelacionamentoApp {
     }
     
     /**
-     * Carrega todos os dados iniciais do Supabase.
+     * Carrega todos os dados iniciais do Supabase de forma concorrente.
+     * @async
+     * @description Realiza consultas paralelas às tabelas 'arquitetos', 'pagamentos',
+     * 'arquivos_importados', 'comissoes_manuais' e 'action_logs' no Supabase.
+     * Popula o estado da aplicação com os dados retornados e trata possíveis erros.
      */
     async loadData() {
         console.log("Carregando dados do Supabase...");
@@ -110,6 +126,7 @@ class RelacionamentoApp {
         
     /**
      * Renderiza ou atualiza todos os componentes visuais da aplicação.
+     * @description Chama todos os métodos de renderização para garantir que a UI reflita o estado atual dos dados.
      */
     renderAll() {
         this.renderArquitetosTable();
@@ -127,6 +144,11 @@ class RelacionamentoApp {
     
     // --- MÉTODOS DE RENDERIZAÇÃO E UI ---
     
+    /**
+     * Renderiza a tabela de arquitetos.
+     * @description Filtra e ordena os arquitetos com base no estado atual da UI e os renderiza em uma tabela HTML.
+     * Inclui funcionalidades de ordenação e exibe colunas condicionais com base no schema do banco de dados.
+     */
     renderArquitetosTable() {
         const container = document.getElementById('arquitetos-table-container');
         if (!container) return;
@@ -194,6 +216,10 @@ class RelacionamentoApp {
         container.innerHTML = `<div class="max-h-[65vh] overflow-y-auto"><table class="w-full"><thead>${headerRow}</thead><tbody>${rows}</tbody></table></div>`;
     }
 
+    /**
+     * Renderiza a seção de pagamentos agrupados por data.
+     * @param {string} [filter=''] - Uma string para filtrar os pagamentos pelo ID do parceiro.
+     */
     renderPagamentos(filter = '') {
         const container = document.getElementById('pagamentos-container');
         if (!container) return;
@@ -227,7 +253,8 @@ class RelacionamentoApp {
     }
 
     /**
-     * NOVO: Renderiza a tabela unificada de resgates.
+     * Renderiza a tabela unificada de resgates.
+     * @param {string} [filter=''] - Uma string para filtrar os resgates pelo ID do parceiro.
      */
     renderResgates(filter = '') {
         const container = document.getElementById('resgates-container');
@@ -260,6 +287,9 @@ class RelacionamentoApp {
         container.innerHTML = `<div class="overflow-x-auto"><table><thead><tr><th>Data</th><th>ID Parceiro</th><th>Parceiro</th><th>Consultor</th><th class="text-right">Valor RT</th><th class="text-center">Pago</th><th>Anexar Comprovante</th><th class="text-center">Ver</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
     }
     
+    /**
+     * Renderiza a tabela de ranking de arquitetos por pontuação.
+     */
     renderRankingTable() {
         const container = document.getElementById('ranking-table-container');
         const ranking = this.arquitetos.map(a => ({ ...a, pontos: this.pontuacoes[a.id] || 0 })).sort((a, b) => b.pontos - a.pontos);
@@ -270,6 +300,9 @@ class RelacionamentoApp {
         container.innerHTML = `<table><thead><tr><th>ID</th><th>Nome</th><th>Pontos</th></tr></thead><tbody>${rows}</tbody></table>`;
     }
     
+    /**
+     * Popula o select de arquitetos com os nomes dos arquitetos cadastrados.
+     */
     populateArquitetoSelect() {
         const select = document.getElementById('arquiteto-select');
         select.innerHTML = '<option value="" class="bg-background-dark">Selecione um arquiteto</option>';
@@ -278,6 +311,9 @@ class RelacionamentoApp {
         });
     }
 
+    /**
+     * Renderiza a lista de arquivos que foram importados.
+     */
     renderArquivosImportados() {
         const container = document.getElementById('arquivos-importados-container');
         container.innerHTML = '';
@@ -291,6 +327,9 @@ class RelacionamentoApp {
         });
     }
 
+    /**
+     * Renderiza o histórico de comissões manuais.
+     */
     renderHistoricoManual() {
         const container = document.getElementById('historico-manual-container');
         if (!container) return;
@@ -342,6 +381,9 @@ class RelacionamentoApp {
             </div>`;
     }
     
+    /**
+     * Renderiza os resultados financeiros totais, como RTs pagas e a pagar.
+     */
     renderResultados() {
         const todosPagamentos = Object.values(this.pagamentos).flat().concat(this.resgates);
 
@@ -367,6 +409,11 @@ class RelacionamentoApp {
         document.getElementById('total-rt-nao-pagas').textContent = quantidadeRTsNaoPagas;
     }
     
+    /**
+     * Renderiza a tabela de dados da API Sysled.
+     * @description Filtra e exibe os dados da API Sysled com base nos filtros da UI.
+     * Formata valores de data e moeda para exibição.
+     */
     renderSysledTable() {
         const container = document.getElementById('sysled-table-container');
         if (!container) return;
@@ -422,6 +469,11 @@ class RelacionamentoApp {
         container.innerHTML = `<div class="max-h-[65vh] overflow-auto"><table><thead class="sticky top-0 z-10"><tr>${headerHtml}</tr><tr>${filterHtml}</tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
     }
 
+    /**
+     * Renderiza o histórico de vendas em um modal.
+     * @param {Array<Object>} salesData - Os dados das vendas a serem exibidos.
+     * @param {boolean} isApiData - Flag que indica se os dados vêm da API, para adicionar links de detalhes.
+     */
     renderSalesHistoryModal(salesData, isApiData) {
         const container = document.getElementById('sales-history-table-container');
         if (!salesData || salesData.length === 0) {
@@ -436,7 +488,9 @@ class RelacionamentoApp {
         container.innerHTML = `<table><thead><tr><th>ID Pedido</th><th class="text-right">Valor da Nota</th><th class="text-center">Data da Venda</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
     }
     
-    // NOVO: Renderiza a tabela de logs de eventos
+    /**
+     * Renderiza a tabela de logs de eventos.
+     */
     renderEventosLog() {
         const container = document.getElementById('eventos-log-container');
         if (!container) return;
@@ -471,6 +525,10 @@ class RelacionamentoApp {
         `;
     }
 
+    /**
+     * Verifica se a funcionalidade de pagamento está habilitada e ajusta o botão correspondente na UI.
+     * @description A funcionalidade de pagamento depende da existência das colunas 'rt_acumulado' e 'rt_total_pago' no banco de dados.
+     */
     checkPaymentFeature() {
         const btn = document.getElementById('gerar-pagamentos-rt-btn');
         if (!btn) return;
@@ -483,6 +541,10 @@ class RelacionamentoApp {
     
     // --- MÉTODOS DE MANIPULAÇÃO DE MODAIS ---
     
+    /**
+     * Abre o modal de mapeamento de colunas de RT (vendas).
+     * @param {Array<string>} headers - Os cabeçalhos do arquivo importado.
+     */
     openRtMappingModal(headers) {
         const form = document.getElementById('rt-mapping-form');
         const modal = document.getElementById('rt-mapping-modal');
@@ -503,6 +565,9 @@ class RelacionamentoApp {
         modal.classList.add('active');
     }
 
+    /**
+     * Fecha o modal de mapeamento de colunas de RT.
+     */
     closeRtMappingModal() {
         document.getElementById('rt-mapping-modal').classList.remove('active');
         const fileInput = document.getElementById('rt-file-input');
@@ -510,6 +575,10 @@ class RelacionamentoApp {
         document.getElementById('rt-file-name').textContent = '';
     }
 
+    /**
+     * Abre o modal de mapeamento de colunas de arquitetos.
+     * @param {Array<string>} headers - Os cabeçalhos do arquivo importado.
+     */
     openArquitetoMappingModal(headers) {
         const form = document.getElementById('arquiteto-mapping-form');
         const modal = document.getElementById('arquiteto-mapping-modal');
@@ -525,6 +594,9 @@ class RelacionamentoApp {
         modal.classList.add('active');
     }
 
+    /**
+     * Fecha o modal de mapeamento de colunas de arquitetos.
+     */
     closeArquitetoMappingModal() {
         document.getElementById('arquiteto-mapping-modal').classList.remove('active');
         const fileInput = document.getElementById('arquiteto-file-input');
@@ -532,6 +604,10 @@ class RelacionamentoApp {
         document.getElementById('file-name-arquitetos').textContent = '';
     }
 
+    /**
+     * Abre o modal de edição de arquiteto.
+     * @param {string} id - O ID do arquiteto a ser editado.
+     */
     openEditModal(id) {
         const arquiteto = this.arquitetos.find(a => String(a.id) === String(id));
         if (!arquiteto) return;
@@ -555,10 +631,17 @@ class RelacionamentoApp {
         this.calculateRT();
     }
 
+    /**
+     * Fecha o modal de edição de arquiteto.
+     */
     closeEditModal() {
         document.getElementById('edit-arquiteto-modal').classList.remove('active');
     }
     
+    /**
+     * Abre o modal para adicionar um valor de venda manual a um arquiteto.
+     * @param {string} id - O ID do arquiteto.
+     */
     openAddValueModal(id) {
         const arquiteto = this.arquitetos.find(a => a.id === id);
         if (!arquiteto) return;
@@ -571,12 +654,20 @@ class RelacionamentoApp {
         modal.classList.add('active');
     }
 
+    /**
+     * Fecha o modal de adicionar valor de venda manual.
+     */
     closeAddValueModal() {
         const modal = document.getElementById('add-value-modal');
         modal.classList.remove('active');
         document.getElementById('add-value-form').reset();
     }
     
+    /**
+     * Abre o modal para visualizar o comprovante de um pagamento ou resgate.
+     * @param {string} pagamentoId - O ID do pagamento ou resgate.
+     * @param {('pagamento'|'resgate')} [type='pagamento'] - O tipo de transação.
+     */
     openComprovanteModal(pagamentoId, type = 'pagamento') {
         let pagamento;
         if (type === 'resgate') {
@@ -600,10 +691,16 @@ class RelacionamentoApp {
         modal.classList.add('active');
     }
     
+    /**
+     * Fecha o modal de visualização de comprovante.
+     */
     closeComprovanteModal() {
         document.getElementById('comprovante-modal').classList.remove('active');
     }
 
+    /**
+     * Abre o modal para gerar pagamentos em lote para arquitetos elegíveis.
+     */
     openGerarPagamentosModal() {
         const container = document.getElementById('gerar-pagamentos-table-container');
         const rowsHtml = this.eligibleForPayment.map(a => `
@@ -616,10 +713,17 @@ class RelacionamentoApp {
         modal.classList.add('active');
     }
 
+    /**
+     * Fecha o modal de geração de pagamentos.
+     */
     closeGerarPagamentosModal() {
         document.getElementById('gerar-pagamentos-modal').classList.remove('active');
     }
 
+    /**
+     * Abre o modal com os detalhes de uma venda específica da API Sysled.
+     * @param {string} pedidoId - O ID do pedido a ser visualizado.
+     */
     openSaleDetailsModal(pedidoId) {
         if (!pedidoId || pedidoId === 'N/A') { alert("ID do Pedido inválido."); return; }
         const saleData = this.sysledData.find(row => String(row.idPedido) === String(pedidoId));
@@ -635,13 +739,23 @@ class RelacionamentoApp {
         modal.classList.add('active');
     }
 
+    /**
+     * Fecha o modal de detalhes da venda.
+     */
     closeSaleDetailsModal() {
         document.getElementById('sale-details-modal').classList.remove('active');
     }
+    /**
+     * Fecha o modal de histórico de vendas.
+     */
     closeSalesHistoryModal() {
         document.getElementById('sales-history-modal').classList.remove('active');
     }
 
+    /**
+     * Abre o modal com os detalhes de uma comissão manual.
+     * @param {number} comissaoId - O ID da comissão manual.
+     */
     openComissaoManualDetailsModal(comissaoId) {
         const comissao = this.comissoesManuais.find(c => c.id === comissaoId);
         if (!comissao) { alert('Detalhes da comissão não encontrados.'); return; }
@@ -680,10 +794,18 @@ class RelacionamentoApp {
         modal.classList.add('active');
     }
 
+    /**
+     * Fecha o modal de detalhes da comissão manual.
+     */
     closeComissaoManualDetailsModal() {
         document.getElementById('comissao-manual-details-modal').classList.remove('active');
     }
 
+    /**
+     * Abre o modal para editar o valor de um RT (pagamento ou resgate).
+     * @param {string} pagamentoId - O ID do pagamento ou resgate.
+     * @param {('pagamento'|'resgate')} [type='pagamento'] - O tipo de transação.
+     */
     openEditRtModal(pagamentoId, type = 'pagamento') {
         let pagamento;
         if (type === 'resgate') {
@@ -704,6 +826,9 @@ class RelacionamentoApp {
         modal.classList.add('active');
     }
 
+    /**
+     * Fecha o modal de edição de valor de RT.
+     */
     closeEditRtModal() {
         const modal = document.getElementById('edit-rt-modal');
         modal.classList.remove('active');
@@ -712,7 +837,11 @@ class RelacionamentoApp {
     
     // --- MÉTODOS DE LÓGICA DE NEGÓCIO E MANIPULAÇÃO DE DADOS ---
 
-    // NOVO: Função para registrar uma ação no log de eventos
+    /**
+     * Registra uma ação no log de eventos do Supabase.
+     * @async
+     * @param {string} actionDescription - A descrição da ação a ser registrada.
+     */
     async logAction(actionDescription) {
         const { error } = await supabase.from('action_logs').insert({
             who_did: this.currentUserEmail,
@@ -723,6 +852,10 @@ class RelacionamentoApp {
         }
     }
     
+    /**
+     * Manipula cliques na tabela de arquitetos, delegando para as ações corretas (editar, deletar, adicionar valor).
+     * @param {Event} e - O objeto do evento de clique.
+     */
     handleArquitetosTableClick(e) {
         const idLink = e.target.closest('.id-link');
         const editBtn = e.target.closest('.edit-btn');
@@ -734,6 +867,10 @@ class RelacionamentoApp {
         if (addValueBtn) this.openAddValueModal(addValueBtn.dataset.id);
     }
     
+    /**
+     * Manipula a seleção de um arquivo de RT (vendas) e abre o modal de mapeamento.
+     * @param {Event} event - O objeto do evento de seleção de arquivo.
+     */
     handleRTFileSelect(event) {
         this.isSysledImport = false;
         const file = event.target.files[0];
@@ -750,6 +887,10 @@ class RelacionamentoApp {
         reader.readAsArrayBuffer(file);
     }
 
+    /**
+     * Processa o mapeamento de colunas de RT (vendas) e inicia o processamento dos dados.
+     * @async
+     */
     async handleRtMapping() {
         const mapping = {};
         document.getElementById('rt-mapping-form').querySelectorAll('select').forEach(s => { mapping[s.name] = s.value; });
@@ -785,6 +926,11 @@ class RelacionamentoApp {
         this.closeRtMappingModal();
     }
 
+    /**
+     * Processa os dados de vendas, atualizando ou criando arquitetos e salvando o arquivo importado.
+     * @async
+     * @param {Array<Object>} data - Os dados de vendas a serem processados.
+     */
     async processRTData(data) {
         const todayKey = new Date().toLocaleDateString('pt-BR');
         const todayDB = new Date().toISOString().slice(0, 10);
@@ -849,6 +995,11 @@ class RelacionamentoApp {
         this.isSysledImport = false;
     }
     
+    /**
+     * Manipula o envio do formulário de adição de arquiteto.
+     * @async
+     * @param {Event} e - O objeto do evento de envio do formulário.
+     */
     async handleAddArquiteto(e) {
         e.preventDefault();
         const id = document.getElementById('arquiteto-id').value;
@@ -866,6 +1017,10 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Manipula a seleção de um arquivo de arquitetos e abre o modal de mapeamento.
+     * @param {Event} event - O objeto do evento de seleção de arquivo.
+     */
     handleArquitetoFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -881,6 +1036,10 @@ class RelacionamentoApp {
         reader.readAsArrayBuffer(file);
     }
     
+    /**
+     * Processa o mapeamento de colunas de arquitetos, criando novos ou atualizando existentes.
+     * @async
+     */
     async handleArquitetoMapping() {
         const mapping = {};
         document.getElementById('arquiteto-mapping-form').querySelectorAll('select').forEach(s => { mapping[s.name] = s.value; });
@@ -975,6 +1134,11 @@ class RelacionamentoApp {
         this.closeArquitetoMappingModal();
     }
 
+    /**
+     * Manipula o envio do formulário de edição de arquiteto.
+     * @async
+     * @param {Event} e - O objeto do evento de envio do formulário.
+     */
     async handleEditArquiteto(e) {
         e.preventDefault();
         const originalId = document.getElementById('edit-arquiteto-original-id').value;
@@ -1006,6 +1170,11 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Deleta um arquiteto do banco de dados.
+     * @async
+     * @param {string} id - O ID do arquiteto a ser deletado.
+     */
     async deleteArquiteto(id) {
         const arq = this.arquitetos.find(a => a.id === id);
         if (!arq) return;
@@ -1021,6 +1190,11 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Deleta TODOS os arquitetos e dados relacionados do banco de dados.
+     * @async
+     * @description Esta é uma ação destrutiva que requer confirmação do usuário.
+     */
     async deleteAllArquitetos() {
         if (confirm('TEM CERTEZA? Esta ação apagará TODOS os dados de forma irreversível.')) {
             const [arq, pag, file, comiss] = await Promise.all([
@@ -1040,6 +1214,9 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Exporta os dados dos arquitetos para um arquivo CSV.
+     */
     exportArquitetosCSV() {
         if (this.arquitetos.length === 0) { alert("Não há dados para exportar."); return; }
         const data = this.arquitetos.map(a => {
@@ -1055,6 +1232,11 @@ class RelacionamentoApp {
         this.logAction("Exportou a lista de arquitetos para CSV.");
     }
 
+    /**
+     * Manipula o envio do formulário para adicionar um valor de venda manual a um arquiteto.
+     * @async
+     * @param {Event} e - O objeto do evento de envio do formulário.
+     */
     async handleAddValue(e) {
         e.preventDefault();
         const id = document.getElementById('add-value-arquiteto-id').value;
@@ -1080,6 +1262,11 @@ class RelacionamentoApp {
         }
     }
     
+    /**
+     * Manipula o envio do formulário para adicionar ou remover pontos de um arquiteto.
+     * @async
+     * @param {Event} e - O objeto do evento de envio do formulário.
+     */
     async handleAddPontos(e) {
         e.preventDefault();
         const id = document.getElementById('arquiteto-select').value;
@@ -1099,6 +1286,10 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Manipula alterações nos checkboxes de status de pagamento e inputs de comprovante.
+     * @param {Event} e - O objeto do evento de alteração.
+     */
     handlePagamentosChange(e) {
         const target = e.target;
         if (!target.matches('.pagamento-status, .comprovante-input')) return;
@@ -1121,6 +1312,10 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Manipula cliques nos botões da seção de pagamentos e resgates.
+     * @param {Event} e - O objeto do evento de clique.
+     */
     handlePagamentosClick(e) {
         const btn = e.target.closest('button');
         if (!btn) return;
@@ -1146,6 +1341,13 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Atualiza o status de um pagamento (pago/não pago) no banco de dados.
+     * @async
+     * @param {string} pagamentoId - O ID do pagamento ou resgate.
+     * @param {boolean} isChecked - O novo status de pagamento.
+     * @param {('pagamento'|'resgate')} type - O tipo de transação.
+     */
     async updatePagamentoStatus(pagamentoId, isChecked, type) {
         let pagamento;
         if (type === 'resgate') {
@@ -1165,6 +1367,13 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Manipula o upload de um comprovante para um pagamento ou resgate.
+     * @async
+     * @param {string} pagamentoId - O ID do pagamento ou resgate.
+     * @param {File} file - O arquivo de comprovante.
+     * @param {('pagamento'|'resgate')} type - O tipo de transação.
+     */
     async handleComprovanteUpload(pagamentoId, file, type) {
         if (!file) return;
 
@@ -1187,6 +1396,11 @@ class RelacionamentoApp {
         }
     }
     
+    /**
+     * Deleta um grupo de pagamentos de uma data específica.
+     * @async
+     * @param {string} date - A data do grupo de pagamentos a ser deletado.
+     */
     async deletePagamentosGroup(date) {
         if (confirm(`Tem certeza que deseja apagar os pagamentos de ${date}?`)) {
             const ids = this.pagamentos[date].map(p => p.id);
@@ -1200,6 +1414,11 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Manipula a atualização do valor de um RT (pagamento ou resgate).
+     * @async
+     * @param {Event} e - O objeto do evento de envio do formulário.
+     */
     async handleUpdateRtValue(e) {
         e.preventDefault();
         const form = e.target;
@@ -1230,6 +1449,10 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Exporta os pagamentos de uma data específica para um arquivo XLSX.
+     * @param {string} date - A data do grupo de pagamentos a ser exportado.
+     */
     exportPagamentosXLSX(date) {
         const data = this.pagamentos[date];
         if (!data || data.length === 0) { alert("Sem dados para exportar."); return; }
@@ -1248,6 +1471,10 @@ class RelacionamentoApp {
         this.logAction(`Exportou o relatório de pagamentos de ${date}.`);
     }
 
+    /**
+     * Gera uma versão para impressão do relatório de pagamentos de uma data específica.
+     * @param {string} date - A data do grupo de pagamentos.
+     */
     generatePagamentoPrint(date) {
         const data = this.pagamentos[date];
         if (!data || data.length === 0) { alert('Sem dados para gerar relatório.'); return; }
@@ -1285,6 +1512,10 @@ class RelacionamentoApp {
         win.document.close();
     }
 
+    /**
+     * Manipula o clique para iniciar a geração de pagamentos em lote.
+     * @async
+     */
     async handleGerarPagamentosClick() {
         if (!this.schemaHasRtAcumulado || !this.schemaHasRtTotalPago) { alert("Funcionalidade desabilitada. Verifique o console."); return; }
         const { data, error } = await supabase.from('arquitetos').select('*');
@@ -1295,6 +1526,10 @@ class RelacionamentoApp {
         this.openGerarPagamentosModal();
     }
 
+    /**
+     * Confirma e gera os comprovantes de pagamento para os arquitetos elegíveis.
+     * @async
+     */
     async confirmarGeracaoComprovantes() {
         if (this.eligibleForPayment.length === 0) return;
 
@@ -1350,6 +1585,10 @@ class RelacionamentoApp {
         document.querySelector('.menu-link[data-tab="comprovantes"]').click();
     }
 
+    /**
+     * Gera um pagamento individual para um arquiteto a partir de sua ficha.
+     * @async
+     */
     async handleGerarPagamentoFicha() {
         const id = document.getElementById('edit-arquiteto-original-id').value;
         const arq = this.arquitetos.find(a => a.id === id);
@@ -1397,7 +1636,8 @@ class RelacionamentoApp {
     }
 
     /**
-     * CORRIGIDO: Gera um resgate a partir da ficha do arquiteto, similar ao Gerar Pagamento.
+     * Gera um resgate a partir da ficha do arquiteto.
+     * @async
      */
     async handleGerarResgateFicha() {
         console.log("Iniciando handleGerarResgateFicha..."); 
@@ -1488,6 +1728,10 @@ class RelacionamentoApp {
         }
     }
     
+    /**
+     * Busca os dados da API Sysled.
+     * @async
+     */
     async fetchSysledData() {
         const container = document.getElementById('sysled-table-container');
         container.innerHTML = `<p class="text-center text-gray-400 py-8">Buscando dados... <span class="material-symbols-outlined animate-spin align-middle">progress_activity</span></p>`;
@@ -1504,6 +1748,9 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Limpa os filtros da tabela Sysled e a renderiza novamente.
+     */
     clearSysledFilters() {
         document.getElementById('sysled-filter-data-inicio').value = '';
         document.getElementById('sysled-filter-data-fim').value = '';
@@ -1512,6 +1759,10 @@ class RelacionamentoApp {
         this.renderSysledTable();
     }
 
+    /**
+     * Manipula o clique para copiar os dados filtrados da Sysled para a importação de RT.
+     * @async
+     */
     async handleCopyToRTClick() {
         if (this.sysledFilteredData.length === 0) {
             alert('Não há dados filtrados para copiar. Por favor, filtre os dados primeiro ou atualize a consulta.');
@@ -1589,6 +1840,11 @@ class RelacionamentoApp {
         }
     }
     
+    /**
+     * Manipula o clique para consultar o histórico de vendas de um arquiteto.
+     * @async
+     * @param {Event} e - O objeto do evento de clique.
+     */
     async handleConsultarVendasClick(e) {
         e.preventDefault();
         const id = document.getElementById('edit-arquiteto-original-id').value;
@@ -1611,11 +1867,20 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Manipula cliques na tabela de histórico de vendas.
+     * @param {Event} e - O objeto do evento de clique.
+     */
     handleSalesHistoryTableClick(e) {
         const btn = e.target.closest('.view-sale-details-btn');
         if (btn) { e.preventDefault(); this.openSaleDetailsModal(btn.dataset.pedidoId); }
     }
     
+    /**
+     * Importa uma única venda a partir do modal de detalhes da venda.
+     * @async
+     * @param {Event} e - O objeto do evento de clique.
+     */
     async handleImportSingleSale(e) {
         const id = e.target.dataset.pedidoId;
         if (!id || id === 'N/A') return;
@@ -1632,6 +1897,10 @@ class RelacionamentoApp {
         this.closeSalesHistoryModal();
     }
 
+    /**
+     * Manipula a ordenação da tabela de arquitetos.
+     * @param {Event} e - O objeto do evento de clique.
+     */
     handleSort(e) {
         const header = e.target.closest('.sortable-header');
         if (!header) return;
@@ -1645,17 +1914,28 @@ class RelacionamentoApp {
         this.renderArquitetosTable();
     }
 
+    /**
+     * Calcula e exibe um valor de RT de exemplo no modal de edição de arquiteto.
+     */
     calculateRT() {
         const valor = parseCurrency(document.getElementById('rt-valor-vendas').textContent);
         const perc = parseFloat(document.getElementById('rt-percentual').value);
         document.getElementById('rt-valor-calculado').textContent = formatCurrency(valor * perc);
     }
 
+    /**
+     * Manipula cliques na seção de arquivos importados.
+     * @param {Event} e - O objeto do evento de clique.
+     */
     handleArquivosImportadosClick(e) {
         const btn = e.target.closest('.download-arquivo-btn');
         if (btn) { e.preventDefault(); this.downloadImportedFile(btn.dataset.date); }
     }
 
+    /**
+     * Inicia o download de um arquivo importado.
+     * @param {string} date - A data do arquivo a ser baixado.
+     */
     downloadImportedFile(date) {
         const file = this.importedFiles[date];
         if (file) {
@@ -1668,6 +1948,11 @@ class RelacionamentoApp {
         }
     }
 
+    /**
+     * Manipula a submissão do formulário de adição de comissão manual.
+     * @async
+     * @param {Event} e - O objeto do evento de submissão.
+     */
     async handleAddComissaoManual(e) {
         e.preventDefault();
         const form = e.target;
@@ -1745,6 +2030,11 @@ class RelacionamentoApp {
         this.renderAll();
     }
     
+    /**
+     * Aprova uma inclusão manual de comissão.
+     * @async
+     * @param {Event} e - O objeto do evento de clique.
+     */
     async handleAprovarInclusaoManual(e) {
         const btn = e.target.closest('#aprovar-inclusao-manual-btn');
         if (!btn) return;
@@ -1824,12 +2114,19 @@ class RelacionamentoApp {
         this.renderAll();
     }
 
+    /**
+     * Manipula cliques na tabela de histórico de inclusões manuais.
+     * @param {Event} e - O objeto do evento de clique.
+     */
     handleHistoricoManualClick(e) {
         const btn = e.target.closest('.view-comissao-details-btn');
         if (btn) { e.preventDefault(); this.openComissaoManualDetailsModal(parseInt(btn.dataset.comissaoId, 10)); }
     }
 
-    // NOVO: Limpa todos os logs de eventos
+    /**
+     * Limpa todos os logs de eventos.
+     * @async
+     */
     async clearEventsLog() {
         if (confirm('Tem certeza que deseja apagar TODOS os logs de eventos? Esta ação é irreversível.')) {
             const { error } = await supabase.from('action_logs').delete().neq('id', 0); // Deleta todos os registros
@@ -1844,7 +2141,12 @@ class RelacionamentoApp {
         }
     }
 
-    // Função para verificar arquitetos não cadastrados
+    /**
+     * Verifica se há arquitetos não cadastrados nos dados processados.
+     * @async
+     * @param {Array<Object>} processedData - Os dados de vendas a serem verificados.
+     * @returns {Promise<Array<Object>>} Uma lista de arquitetos não cadastrados.
+     */
     async verificarArquitetosNaoCadastrados(processedData) {
         const arquitetosIds = [...new Set(processedData.map(row => String(row.id_parceiro)))];
         const arquitetosNaoCadastrados = [];
@@ -1863,7 +2165,10 @@ class RelacionamentoApp {
         return arquitetosNaoCadastrados;
     }
 
-    // Mostra o modal de cadastro de novo arquiteto
+    /**
+     * Mostra o modal de cadastro de novo arquiteto.
+     * @param {Object} arquiteto - O objeto do arquiteto a ser cadastrado.
+     */
     showNovoArquitetoModal(arquiteto) {
         document.getElementById('novo-arquiteto-id').value = arquiteto.id;
         document.getElementById('novo-arquiteto-nome').value = arquiteto.nome;
@@ -1883,14 +2188,20 @@ class RelacionamentoApp {
         modal.classList.add('active');
     }
 
-    // Cancela o cadastro de novo arquiteto
+    /**
+     * Cancela o cadastro de novo arquiteto e a importação pendente.
+     */
     cancelNovoArquiteto() {
         document.getElementById('novo-arquiteto-modal').classList.remove('active');
         this.isSysledImport = false;
         this.pendingImportData = null;
     }
 
-    // Processa o cadastro de novo arquiteto
+    /**
+     * Processa o cadastro de um novo arquiteto.
+     * @async
+     * @param {Event} e - O objeto do evento de submissão do formulário.
+     */
     async handleNovoArquitetoSubmit(e) {
         e.preventDefault();
         
@@ -1948,7 +2259,10 @@ class RelacionamentoApp {
         }
     }
 
-    // Continua a importação após cadastrar o arquiteto
+    /**
+     * Continua o processo de importação após o cadastro de um novo arquiteto.
+     * @async
+     */
     async continuarImportacao() {
         if (!this.pendingImportData) return;
         
